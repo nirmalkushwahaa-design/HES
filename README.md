@@ -2,9 +2,9 @@
 
 Static HTML/CSS/JS mockups for the redesigned Anantya HES (Head-End System) admin dashboard, prepared by Redmelon for the Gridcrest Technology pitch.
 
-**Live:** https://anantya-hes-pitch.pages.dev (hosted on Cloudflare Pages, deployed from this private repo — the repo itself stays private, the preview link is what gets shared)
+This is private, pre-deal pitch material — not deployed to a public URL. Open any file directly in a browser to view it locally (start with `index.html` or `dashboard.html`).
 
-These are self-contained HTML files with no build step. Open any file directly in a browser to view it locally, or just use the live link above.
+**Note:** this was briefly live on Cloudflare Pages (public URL, gate-able only via a manual dashboard step) and was taken down once we confirmed that wasn't intended. If you want a shareable live link again, it needs Cloudflare Access (or similar) configured first so it isn't open to anyone with the URL.
 
 ## Pages
 
