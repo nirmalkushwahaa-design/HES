@@ -3,37 +3,37 @@
 <style>
   :root {
     color-scheme: light;
-    --bg:            #F7F9FC;
-    --bg-raised:     #FFFFFF;
-    --bg-sunken:     #EEF2F8;
-    --border:        #DDE3EC;
-    --border-strong: #C7D0DE;
-    --text:          #0D1117;
-    --text-2:        #5A6478;
-    --text-3:        #8B95A8;
-    --accent:        #00B8C2;
-    --accent-dim:    #E0F9FA;
-    --accent-text:   #007A82;
-    --shadow:        0 1px 3px rgba(15,23,42,.07), 0 1px 2px rgba(15,23,42,.04);
-    --shadow-md:     0 4px 16px rgba(15,23,42,.09), 0 1px 2px rgba(15,23,42,.05);
-    --radius:        10px;
+    --bg:            oklch(98.5% .002 260);
+    --bg-raised:     oklch(100% 0 0);
+    --bg-sunken:     oklch(96.5% .012 265);
+    --border:        oklch(92.5% .008 255);
+    --border-strong: oklch(85% .01 255);
+    --text:          oklch(21% .03 265);
+    --text-2:        oklch(45% .025 262);
+    --text-3:        oklch(55% .03 257);
+    --accent:        oklch(55% .21 273);
+    --accent-dim:    oklch(95.5% .03 273);
+    --accent-text:   oklch(45% .18 273);
+    --shadow:        0 1px 2px oklch(21% .03 265/.05), 0 1px 3px oklch(21% .03 265/.04);
+    --shadow-md:     0 4px 12px oklch(21% .03 265/.10), 0 2px 4px oklch(21% .03 265/.06);
+    --radius:        .75rem;
     --radius-sm:     6px;
 
-    --status-good:        #0ca30c;
-    --status-warning:     #d98a00;
-    --status-serious:     #d2611e;
-    --status-critical:    #d03b3b;
-    --status-good-bg:     #E6F6E4;
-    --status-warning-bg:  #FCF1DA;
-    --status-serious-bg:  #FBE8DC;
-    --status-critical-bg: #FBE6E6;
+    --status-good:        oklch(50% .15 152);
+    --status-warning:     oklch(55% .15 70);
+    --status-serious:     oklch(52% .16 45);
+    --status-critical:    oklch(55% .22 25);
+    --status-good-bg:     oklch(95% .05 152);
+    --status-warning-bg:  oklch(96% .05 80);
+    --status-serious-bg:  oklch(95% .05 45);
+    --status-critical-bg: oklch(95.5% .03 25);
 
-    --cat-1: #2a78d6;
-    --cat-2: #eb6834;
+    --cat-1: oklch(62% .16 250);
+    --cat-2: oklch(72% .18 55);
 
-    --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
-    --font-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", Menlo, monospace;
-    --nav-w: 248px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+    --font-mono: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+    --nav-w: 240px;
   }
 
   *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
