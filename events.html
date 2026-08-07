@@ -1,0 +1,717 @@
+<title>Anantya HES — Events</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg:            #F7F9FC;
+    --bg-raised:     #FFFFFF;
+    --bg-sunken:     #EEF2F8;
+    --border:        #DDE3EC;
+    --border-strong: #C7D0DE;
+    --text:          #0D1117;
+    --text-2:        #5A6478;
+    --text-3:        #8B95A8;
+    --accent:        #00B8C2;
+    --accent-dim:    #E0F9FA;
+    --accent-text:   #007A82;
+    --shadow:        0 1px 3px rgba(15,23,42,.07), 0 1px 2px rgba(15,23,42,.04);
+    --shadow-md:     0 4px 16px rgba(15,23,42,.09), 0 1px 2px rgba(15,23,42,.05);
+    --radius:        10px;
+    --radius-sm:     6px;
+
+    --status-good:        #0ca30c;
+    --status-warning:     #d98a00;
+    --status-serious:     #d2611e;
+    --status-critical:    #d03b3b;
+    --status-good-bg:     #E6F6E4;
+    --status-warning-bg:  #FCF1DA;
+    --status-serious-bg:  #FBE8DC;
+    --status-critical-bg: #FBE6E6;
+
+    --cat-1: #2a78d6;
+    --cat-2: #eb6834;
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", Menlo, monospace;
+    --nav-w: 248px;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:var(--font-sans); background:var(--bg); color:var(--text); font-size:13.5px; line-height:1.5; display:flex; min-height:100vh; }
+  ::selection{ background:var(--accent-dim); color:var(--accent-text); }
+  a{ color:inherit; }
+  button{ font:inherit; color:inherit; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .tabular{ font-variant-numeric:tabular-nums; }
+
+  /* ---------- Sidebar (shared shell) ---------- */
+  .sidebar{ width:var(--nav-w); min-width:var(--nav-w); height:100vh; position:sticky; top:0; overflow-y:auto; background:var(--bg-raised); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:18px 0 20px; }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 18px 18px; border-bottom:1px solid var(--border); margin-bottom:14px; }
+  .brand-mark{ width:32px; height:32px; border-radius:8px; flex-shrink:0; background:linear-gradient(135deg, var(--accent), var(--cat-1)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px; letter-spacing:-.02em; }
+  .brand-text .name{ font-size:13.5px; font-weight:700; letter-spacing:-.01em; }
+  .brand-text .sub{ font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:1px; }
+  .nav-group{ margin-bottom:2px; }
+  .nav-label{ font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); padding:14px 18px 6px; }
+  .nav-toggle{ display:flex; align-items:center; justify-content:space-between; width:100%; border:none; background:none; cursor:pointer; font-family:inherit; }
+  .nav-toggle:hover{ color:var(--text-2); }
+  .toggle-icon{ width:15px; height:15px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:4px; font-size:11px; line-height:1; color:var(--text-3); font-weight:600; font-family:var(--font-mono); }
+  .nav-toggle:hover .toggle-icon{ border-color:var(--border-strong); color:var(--text-2); }
+  .nav-children.collapsed{ display:none; }
+  .nav-link{ display:flex; align-items:center; gap:10px; padding:7px 18px; margin:0 8px; border-radius:7px; text-decoration:none; font-size:12.8px; color:var(--text-2); font-weight:500; transition:background .12s, color .12s; cursor:pointer; border:none; background:none; width:calc(100% - 16px); text-align:left; }
+  .nav-link svg{ width:16px; height:16px; flex-shrink:0; opacity:.85; }
+  .nav-link:hover{ background:var(--bg-sunken); color:var(--text); }
+  .nav-link.active{ background:var(--accent-dim); color:var(--accent-text); font-weight:600; }
+  .nav-link.active svg{ opacity:1; }
+  .nav-badge{ margin-left:auto; font-family:var(--font-mono); font-size:10px; font-weight:700; padding:1px 6px; border-radius:99px; background:var(--status-critical-bg); color:var(--status-critical); }
+  .nav-children{ position:relative; margin-left:29px; padding-left:9px; border-left:1px solid var(--border); display:flex; flex-direction:column; }
+  .nav-children .nav-link{ margin:0 8px 0 0; padding-left:9px; font-size:12.4px; }
+  .nav-link.stub{ color:var(--text-3); }
+  .nav-link.stub svg{ opacity:.55; }
+  .nav-link.stub:hover{ color:var(--text-2); }
+  .stub-tag{ margin-left:auto; font-size:9.5px; font-weight:600; color:var(--text-3); background:var(--bg-sunken); border:1px solid var(--border); padding:1px 6px; border-radius:99px; white-space:nowrap; }
+  .sidebar-foot{ margin-top:auto; padding:14px 18px 0; border-top:1px solid var(--border); padding-top:14px; }
+  .env-pill{ display:flex; align-items:center; gap:7px; font-size:11px; color:var(--text-3); font-family:var(--font-mono); }
+  .env-dot{ width:6px; height:6px; border-radius:50%; background:var(--status-good); flex-shrink:0; }
+
+  /* ---------- Shell / topbar ---------- */
+  .shell{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .topbar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px; padding:12px 28px; background:var(--bg); border-bottom:1px solid var(--border); }
+  .search{ display:flex; align-items:center; gap:8px; flex:1; max-width:420px; background:var(--bg-raised); border:1px solid var(--border); border-radius:8px; padding:7px 12px; color:var(--text-3); }
+  .search svg{ width:15px; height:15px; flex-shrink:0; }
+  .search input{ border:none; outline:none; background:none; color:var(--text); font-size:12.8px; width:100%; font-family:var(--font-sans); }
+  .search input::placeholder{ color:var(--text-3); }
+  .search kbd{ font-family:var(--font-mono); font-size:10px; color:var(--text-3); border:1px solid var(--border); border-radius:4px; padding:1px 5px; flex-shrink:0; }
+  .cluster-select{ display:flex; align-items:center; gap:8px; padding:6px 10px 6px 12px; border:1px solid var(--border); border-radius:8px; background:var(--bg-raised); font-size:12px; cursor:pointer; color:var(--text); }
+  .cluster-select .dim{ color:var(--text-3); font-family:var(--font-mono); font-size:11px; }
+  .cluster-select svg{ width:13px; height:13px; color:var(--text-3); }
+  .topbar-right{ display:flex; align-items:center; gap:10px; margin-left:auto; }
+  .icon-btn{ position:relative; width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:var(--bg-raised); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .icon-btn svg{ width:15px; height:15px; color:var(--text-2); }
+  .icon-btn:hover{ border-color:var(--border-strong); }
+  .icon-btn .dot{ position:absolute; top:-3px; right:-3px; min-width:14px; height:14px; padding:0 3px; border-radius:99px; background:var(--status-critical); color:#fff; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); border:2px solid var(--bg); }
+  .user-chip{ display:flex; align-items:center; gap:8px; padding:4px 10px 4px 4px; border:1px solid var(--border); border-radius:99px; background:var(--bg-raised); cursor:pointer; }
+  .avatar{ width:24px; height:24px; border-radius:50%; background:var(--cat-1); color:#fff; font-size:10.5px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .user-chip .u-name{ font-size:12px; font-weight:600; line-height:1.15; }
+  .user-chip .u-role{ font-size:10px; color:var(--text-3); line-height:1.15; }
+
+  /* ---------- Main / page head ---------- */
+  .main{ padding:22px 28px 48px; max-width:1600px; }
+  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+  .crumb{ font-size:11px; color:var(--text-3); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+  .page-head h1{ font-size:21px; font-weight:700; letter-spacing:-.01em; }
+  .page-head .ctx{ font-size:12.3px; color:var(--text-2); margin-top:4px; font-family:var(--font-mono); }
+  .page-head .ctx b{ color:var(--text); font-weight:600; }
+  .updated{ font-size:11.5px; color:var(--text-3); display:flex; align-items:center; gap:6px; }
+  .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--status-good); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+  @media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
+
+  .card{ background:var(--bg-raised); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--border); gap:10px; }
+  .card-head h2{ font-size:13px; font-weight:700; letter-spacing:-.005em; }
+  .card-head .hint{ font-size:11px; color:var(--text-3); }
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; }
+  .pill svg{ width:9px; height:9px; }
+  .pill.good{ background:var(--status-good-bg); color:var(--status-good); }
+  .pill.warn{ background:var(--status-warning-bg); color:var(--status-warning); }
+  .pill.serious{ background:var(--status-serious-bg); color:var(--status-serious); }
+  .pill.crit{ background:var(--status-critical-bg); color:var(--status-critical); }
+  .pill.muted{ background:var(--bg-sunken); color:var(--text-3); }
+  .pill.info{ background:var(--accent-dim); color:var(--accent-text); }
+  .mono{ font-family:var(--font-mono); }
+  .ghost-btn{ font-size:11.5px; font-weight:600; padding:6px 12px; border-radius:7px; border:1px solid var(--border); background:var(--bg-raised); cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .ghost-btn:hover{ border-color:var(--border-strong); background:var(--bg-sunken); }
+  .ghost-btn:disabled{ opacity:.4; cursor:default; }
+  .ghost-btn svg{ width:13px; height:13px; }
+  .primary-btn{ font-size:11.5px; font-weight:700; padding:7px 13px; border-radius:7px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer; }
+  .primary-btn:hover{ opacity:.92; }
+  .primary-btn:disabled{ opacity:.4; cursor:default; }
+
+  /* ---------- Summary stat row ---------- */
+  .stat-row{ display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:16px; }
+  .stat-card{ text-align:left; background:var(--bg-raised); border:1px solid var(--border); border-radius:var(--radius); padding:13px 15px; box-shadow:var(--shadow); cursor:pointer; }
+  .stat-card:hover{ border-color:var(--border-strong); }
+  .stat-card.active{ border-color:var(--accent); background:var(--accent-dim); }
+  .stat-label{ font-size:10.5px; color:var(--text-2); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .stat-val{ font-family:var(--font-mono); font-size:21px; font-weight:700; margin-top:6px; }
+  .stat-val.crit{ color:var(--status-critical); }
+  .stat-val.serious{ color:var(--status-serious); }
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{ display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .filter-bar .search{ max-width:260px; padding:6px 10px; }
+  .filter-bar select{ font-size:11.8px; border:1px solid var(--border); border-radius:7px; background:var(--bg-raised); color:var(--text); padding:6px 8px; }
+  .filter-bar .spacer{ flex:1; }
+  .filter-count{ font-size:11px; color:var(--text-3); }
+
+  /* ---------- Severity / category strip ---------- */
+  .facet-wrap{ display:flex; gap:16px; padding:14px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .facet-block{ flex:1; min-width:220px; }
+  .facet-title{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3); margin-bottom:8px; }
+  .sev-btn-row{ display:flex; flex-direction:column; gap:5px; }
+  .sev-btn{ display:flex; align-items:center; gap:8px; border:1px solid transparent; background:none; border-radius:6px; padding:4px 6px; cursor:pointer; text-align:left; }
+  .sev-btn:hover{ background:var(--bg-sunken); }
+  .sev-btn.active{ border-color:var(--border-strong); background:var(--bg-sunken); }
+  .sev-btn .swatch{ width:9px; height:9px; border-radius:2.5px; flex-shrink:0; }
+  .sev-btn .lbl{ font-size:11.8px; flex:1; }
+  .sev-btn .cnt{ font-family:var(--font-mono); font-size:11.5px; font-weight:700; }
+  .cat-chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .cat-chip{ font-size:11.3px; font-weight:600; padding:5px 10px; border-radius:99px; border:1px solid var(--border); background:var(--bg-raised); cursor:pointer; }
+  .cat-chip:hover{ border-color:var(--border-strong); }
+  .cat-chip.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .cat-chip .cnt{ font-family:var(--font-mono); opacity:.75; margin-left:4px; }
+
+  /* ---------- Events layout: list + detail ---------- */
+  .events-grid{ display:grid; grid-template-columns:1fr 380px; gap:16px; align-items:start; }
+  table{ width:100%; border-collapse:collapse; font-size:12.3px; }
+  .table-wrap{ overflow-x:auto; }
+  thead th{ text-align:left; padding:8px 16px; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-3); background:var(--bg-sunken); border-bottom:1px solid var(--border); white-space:nowrap; }
+  tbody td{ padding:9px 16px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tbody tr{ cursor:pointer; }
+  tbody tr:hover td{ background:var(--bg-sunken); }
+  tbody tr.selected td{ background:var(--accent-dim); }
+  .ev-name{ font-weight:600; }
+  .ev-device{ display:flex; flex-direction:column; }
+  .ev-device .dn{ font-size:11.6px; }
+  .ev-device .di{ font-size:10.3px; color:var(--text-3); font-family:var(--font-mono); }
+  .empty-state{ padding:40px 20px; text-align:center; color:var(--text-3); font-size:12.5px; }
+  .panel-pagination{ display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-top:1px solid var(--border); font-size:11px; color:var(--text-3); }
+  .pg-btns{ display:flex; align-items:center; gap:6px; }
+  .pg-btns button{ width:22px; height:22px; border-radius:5px; border:1px solid var(--border); background:var(--bg-raised); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .pg-btns button:disabled{ opacity:.4; cursor:default; }
+  .pg-btns button svg{ width:11px; height:11px; }
+  .pg-cur{ font-family:var(--font-mono); font-weight:700; color:var(--text); padding:0 3px; }
+
+  /* ---------- Event detail panel ---------- */
+  .ev-detail-head{ padding:16px 18px; border-bottom:1px solid var(--border); }
+  .ev-detail-head .evh-top{ display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+  .ev-detail-head h3{ font-size:14.5px; font-weight:700; letter-spacing:-.005em; }
+  .ev-detail-head .evh-meta{ font-size:11.3px; color:var(--text-3); font-family:var(--font-mono); }
+  .ev-section{ padding:14px 18px; border-bottom:1px solid var(--border); }
+  .ev-section:last-child{ border-bottom:none; }
+  .ev-section-title{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3); margin-bottom:10px; }
+  .ev-meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; }
+  .ev-meta-item dt{ font-size:10px; color:var(--text-3); text-transform:uppercase; letter-spacing:.03em; margin-bottom:2px; }
+  .ev-meta-item dd{ font-size:12.3px; font-weight:600; }
+  .ev-meta-item dd.mono{ font-family:var(--font-mono); font-weight:600; }
+  .ev-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .assign-row{ display:flex; gap:8px; margin-top:8px; }
+  .assign-row[hidden]{ display:none; }
+  .assign-row select{ flex:1; font-size:11.8px; border:1px solid var(--border); border-radius:7px; background:var(--bg-raised); color:var(--text); padding:6px 8px; }
+  .note-list{ display:flex; flex-direction:column; gap:9px; margin-bottom:10px; max-height:160px; overflow-y:auto; }
+  .note-item{ background:var(--bg-sunken); border-radius:7px; padding:8px 10px; }
+  .note-item .na{ font-size:11px; font-weight:700; }
+  .note-item .nt{ font-size:10.3px; color:var(--text-3); font-family:var(--font-mono); margin-left:6px; }
+  .note-item .nb{ font-size:11.8px; color:var(--text-2); margin-top:3px; }
+  .note-input{ display:flex; gap:8px; }
+  .note-input textarea{ flex:1; resize:vertical; min-height:44px; font:inherit; font-size:12px; border:1px solid var(--border); border-radius:7px; padding:7px 9px; background:var(--bg-raised); color:var(--text); }
+  .device-context{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+
+  @media (max-width: 1280px){
+    .events-grid{ grid-template-columns:1fr; }
+    .stat-row{ grid-template-columns:repeat(3,1fr); }
+  }
+  @media (max-width: 860px){
+    body{ flex-direction:column; }
+    .sidebar{ width:100%; min-width:unset; max-height:60vh; position:relative; padding:12px 0; }
+    .sidebar-foot{ display:none; }
+    .main{ padding:18px 16px 40px; }
+    .topbar{ padding:10px 16px; flex-wrap:wrap; }
+    .search{ order:1; max-width:none; flex-basis:100%; }
+    .cluster-select{ order:2; }
+    .stat-row{ grid-template-columns:repeat(2,1fr); }
+    .ev-meta-grid{ grid-template-columns:1fr; }
+  }
+</style>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">AH</div>
+    <div class="brand-text"><div class="name">Anantya HES</div><div class="sub">Admin Dashboard</div></div>
+  </div>
+
+  <div class="nav-group">
+    <a class="nav-link" href="https://claude.ai/code/artifact/c9ace6f9-a00f-45ee-b781-044414febecf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Dashboard
+    </a>
+  </div>
+
+  <div class="nav-group">
+    <button class="nav-label nav-toggle" aria-expanded="true" aria-controls="system-children">
+      <span>System</span><span class="toggle-icon" aria-hidden="true">−</span>
+    </button>
+    <div class="nav-children" id="system-children">
+      <a class="nav-link" href="https://claude.ai/code/artifact/6f40726f-037c-4043-bbda-c2812cd98807">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+        Home
+      </a>
+      <button class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Events
+        <span class="nav-badge" id="sidebar-alarm-badge">184</span>
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        Data
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Schedules
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Activity
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M17 14v6M14 17h6"/></svg>
+        Management
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        Map
+      </button>
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a8 8 0 0 1 16 0"/><path d="M12 15 16 9"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/></svg>
+      SLA Performance <span class="stub-tag">not set up</span>
+    </button>
+    <button class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>
+      Communication Logs
+    </button>
+    <button class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+      System Settings
+    </button>
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+      System Monitoring <span class="stub-tag">not set up</span>
+    </button>
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg>
+      KPI Dashboard <span class="stub-tag">not set up</span>
+    </button>
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4"/><path d="M9 13h6M9 16.5h6M9 9.5h2"/></svg>
+      Reporting <span class="stub-tag">not set up</span>
+    </button>
+  </div>
+
+  <div class="sidebar-foot"><div class="env-pill"><span class="env-dot"></span> SQA · api-cluster-02.hes.internal</div></div>
+</aside>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search device ID, serial number, name…" aria-label="Search devices" />
+      <kbd>/</kbd>
+    </div>
+    <button class="cluster-select">
+      DISCOM-04 <span class="dim">· Cluster 02/04</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="topbar-right">
+      <button class="icon-btn" aria-label="Alarms" title="Active alarms">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="dot" id="topbar-alarm-badge">184</span>
+      </button>
+      <button class="user-chip">
+        <span class="avatar">NK</span>
+        <span><div class="u-name">N. Kumar</div><div class="u-role">Supervisor</div></span>
+      </button>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="crumb">System / Events</div>
+        <h1>Events</h1>
+        <div class="ctx">DISCOM‑04 · Cluster <b>02 / 04</b> · showing events for this cluster</div>
+      </div>
+      <div class="updated"><span class="live-dot"></span> Live · updated 14 seconds ago</div>
+    </div>
+
+    <!-- Operational summary — click a card to filter -->
+    <div class="stat-row" id="stat-row"></div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="filter-bar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="ev-search" placeholder="Search device or event name…" aria-label="Search events" />
+        </div>
+        <select id="ev-status" aria-label="Filter by status">
+          <option value="">All statuses</option>
+          <option value="new">New</option>
+          <option value="ack">Acknowledged</option>
+          <option value="assigned">Assigned</option>
+          <option value="resolved">Resolved</option>
+        </select>
+        <select id="ev-date" aria-label="Filter by date range">
+          <option value="all">All time</option>
+          <option value="1">Last hour</option>
+          <option value="24">Last 24 hours</option>
+          <option value="168">Last 7 days</option>
+        </select>
+        <div class="spacer"></div>
+        <span class="filter-count" id="filter-count"></span>
+        <button class="ghost-btn" id="clear-filters">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m-9 0v14a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6"/></svg>
+          Clear filters
+        </button>
+      </div>
+
+      <div class="facet-wrap">
+        <div class="facet-block">
+          <div class="facet-title">Severity — click to filter</div>
+          <div class="sev-btn-row" id="sev-facets"></div>
+        </div>
+        <div class="facet-block" style="flex:1.4;">
+          <div class="facet-title">Category — click to filter</div>
+          <div class="cat-chip-row" id="cat-facets"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="events-grid">
+      <!-- Event list -->
+      <div class="card">
+        <div class="card-head"><h2>Event List</h2><span class="hint" id="list-hint"></span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Severity</th><th>Event</th><th>Device</th><th>Category</th><th>Occurred</th><th>Status</th></tr></thead>
+            <tbody id="event-body"></tbody>
+          </table>
+        </div>
+        <div class="panel-pagination">
+          <span id="pg-summary">—</span>
+          <div class="pg-btns">
+            <button id="pg-prev" aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+            <span class="pg-cur" id="pg-cur">1</span>
+            <button id="pg-next" aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event detail -->
+      <div class="card" id="event-detail"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  // ---------------------------------------------------------------
+  // Device context — same 5 devices used on Home, kept consistent.
+  // ---------------------------------------------------------------
+  var devices = {
+    'HES-DL-042931': { name:'DT‑04 · Sundarpada Feeder', zone:'North', comm:'good', power:'good', lastComm:'2 min ago' },
+    'HES-RF-118820':  { name:'DT‑11 · Khandagiri Line',   zone:'East',  comm:'good', power:'good', lastComm:'41 sec ago' },
+    'HES-DL-076615':  { name:'DT‑07 · Patia Substation',  zone:'South', comm:'crit', power:'warn', lastComm:'6 hr 12 min ago' },
+    'HES-RF-337204':  { name:'DT‑33 · Chandrasekharpur',  zone:'West',  comm:'crit', power:'crit', lastComm:'1 day 3 hr ago' },
+    'HES-DL-291187':  { name:'DT‑29 · Nayapalli Zone',    zone:'North', comm:'good', power:'good', lastComm:'14 sec ago' }
+  };
+
+  var severities = ['Critical','Major','Minor','Info'];
+  var sevClass   = { Critical:'crit', Major:'serious', Minor:'warn', Info:'good' };
+  var categories = ['Power Alert','Device Data','Tampering','Clock Synchronization'];
+  var statusMeta = { new:{label:'New', cls:'warn'}, ack:{label:'Acknowledged', cls:'muted'}, assigned:{label:'Assigned', cls:'info'}, resolved:{label:'Resolved', cls:'good'} };
+
+  function minutesAgoLabel(min){
+    if (min < 60) return min + ' min ago';
+    if (min < 60*24) return Math.round(min/60) + ' hr ago';
+    return Math.round(min/60/24) + ' day' + (Math.round(min/60/24) === 1 ? '' : 's') + ' ago';
+  }
+
+  // ---------------------------------------------------------------
+  // Mock event dataset. minAgo drives both display and date-range filtering.
+  // ---------------------------------------------------------------
+  var seq = 1;
+  function ev(name, category, severity, status, device, minAgo, assignedTo){
+    return { id:'EVT-' + String(seq++).padStart(4,'0'), name:name, category:category, severity:severity,
+      status:status, device:device, minAgo:minAgo, assignedTo:assignedTo || null, notes:[] };
+  }
+  var events = [
+    ev('Power Failure', 'Power Alert', 'Critical', 'new', 'HES-DL-042931', 3),
+    ev('Tamper Detected', 'Tampering', 'Critical', 'new', 'HES-RF-118820', 19),
+    ev('Communication Loss', 'Device Data', 'Major', 'ack', 'HES-RF-337204', 61, null),
+    ev('Clock Out of Sync', 'Clock Synchronization', 'Major', 'new', 'HES-DL-076615', 132),
+    ev('Low Battery', 'Device Data', 'Minor', 'new', 'HES-DL-291187', 244),
+    ev('Cover Open', 'Tampering', 'Critical', 'assigned', 'HES-RF-337204', 300, 'A. Chhaya'),
+    ev('Meter Switched On', 'Device Data', 'Info', 'resolved', 'HES-DL-042931', 340, 'N. Kumar'),
+    ev('Voltage Fluctuation', 'Power Alert', 'Minor', 'new', 'HES-RF-118820', 400),
+    ev('Meter Switched Off', 'Device Data', 'Info', 'new', 'HES-DL-076615', 455),
+    ev('Clock Synchronized', 'Clock Synchronization', 'Info', 'resolved', 'HES-DL-042931', 520, 'N. Kumar'),
+    ev('Power Restored', 'Power Alert', 'Info', 'resolved', 'HES-DL-042931', 560, 'N. Kumar'),
+    ev('Magnetic Interference', 'Tampering', 'Major', 'new', 'HES-RF-337204', 610),
+    ev('Daily Profile Received', 'Device Data', 'Info', 'new', 'HES-DL-291187', 700),
+    ev('Power Failure', 'Power Alert', 'Critical', 'ack', 'HES-DL-076615', 780, null),
+    ev('Tamper Detected', 'Tampering', 'Major', 'new', 'HES-DL-291187', 900),
+    ev('Clock Out of Sync', 'Clock Synchronization', 'Minor', 'new', 'HES-RF-118820', 1040),
+    ev('Communication Loss', 'Device Data', 'Major', 'new', 'HES-RF-337204', 1180),
+    ev('Voltage Fluctuation', 'Power Alert', 'Minor', 'resolved', 'HES-RF-118820', 1400, 'A. Chhaya'),
+    ev('Meter Switched On', 'Device Data', 'Info', 'new', 'HES-DL-076615', 1600),
+    ev('Cover Open', 'Tampering', 'Major', 'new', 'HES-DL-042931', 2000)
+  ];
+
+  var state = { search:'', severity:null, category:null, status:'', date:'all', page:1, selected:events[0].id };
+  var pageSize = 8;
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  function activeAlarmCount(){
+    return events.filter(function(e){ return e.status !== 'resolved'; }).length;
+  }
+
+  function filteredEvents(){
+    var q = state.search.trim().toLowerCase();
+    return events.filter(function(e){
+      if (state.severity && e.severity !== state.severity) return false;
+      if (state.category && e.category !== state.category) return false;
+      if (state.status && e.status !== state.status) return false;
+      if (state.date !== 'all' && e.minAgo > Number(state.date) * 60) return false;
+      if (q){
+        var d = devices[e.device];
+        var hay = (e.name + ' ' + e.device + ' ' + (d ? d.name : '')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    }).sort(function(a,b){ return a.minAgo - b.minAgo; });
+  }
+
+  // ---- Summary stat cards (computed from full, unfiltered dataset) ----
+  function renderStats(){
+    var critActive = events.filter(function(e){ return e.severity === 'Critical' && e.status !== 'resolved'; }).length;
+    var majorActive = events.filter(function(e){ return e.severity === 'Major' && e.status !== 'resolved'; }).length;
+    var unacked = events.filter(function(e){ return e.status === 'new'; }).length;
+    var affectedDevices = new Set(events.filter(function(e){ return e.status !== 'resolved'; }).map(function(e){ return e.device; })).size;
+    var last24h = events.filter(function(e){ return e.minAgo <= 24*60; }).length;
+
+    var cards = [
+      { key:'crit-active', label:'Critical Active', val:critActive, cls:'crit', apply:function(){ state.severity='Critical'; state.status=''; } },
+      { key:'major-active', label:'Major Active', val:majorActive, cls:'serious', apply:function(){ state.severity='Major'; state.status=''; } },
+      { key:'unacked', label:'Unacknowledged', val:unacked, cls:'', apply:function(){ state.status='new'; state.severity=null; } },
+      { key:'affected', label:'Affected Devices', val:affectedDevices, cls:'', apply:function(){ state.status=''; state.severity=null; } },
+      { key:'24h', label:'Events (24h)', val:last24h, cls:'', apply:function(){ state.date='24'; document.getElementById('ev-date').value='24'; } }
+    ];
+    document.getElementById('stat-row').innerHTML = cards.map(function(c){
+      return '<button class="stat-card' + (state.activeCard === c.key ? ' active' : '') + '" data-card="' + c.key + '">' +
+        '<div class="stat-label">' + c.label + '</div>' +
+        '<div class="stat-val ' + c.cls + ' tabular">' + c.val + '</div>' +
+      '</button>';
+    }).join('');
+    document.getElementById('stat-row').querySelectorAll('.stat-card').forEach(function(btn, i){
+      btn.addEventListener('click', function(){
+        var wasActive = state.activeCard === cards[i].key;
+        clearFacets(false);
+        if (wasActive){ state.activeCard = null; }
+        else { cards[i].apply(); state.activeCard = cards[i].key; }
+        syncFilterInputs();
+        renderAll();
+      });
+    });
+
+    var badge = String(critActive + majorActive);
+    document.getElementById('sidebar-alarm-badge').textContent = badge;
+    document.getElementById('topbar-alarm-badge').textContent = badge;
+  }
+
+  // ---- Severity / category facets (computed from full dataset; click = filter) ----
+  function renderFacets(){
+    var sevBody = document.getElementById('sev-facets');
+    sevBody.innerHTML = severities.map(function(s){
+      var count = events.filter(function(e){ return e.severity === s; }).length;
+      return '<button class="sev-btn' + (state.severity === s ? ' active' : '') + '" data-sev="' + s + '">' +
+        '<span class="swatch" style="background:var(--status-' + ({crit:'critical',serious:'serious',warn:'warning',good:'good'}[sevClass[s]]) + ')"></span>' +
+        '<span class="lbl">' + s + '</span><span class="cnt tabular">' + count + '</span></button>';
+    }).join('');
+    sevBody.querySelectorAll('.sev-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        state.activeCard = null;
+        state.severity = state.severity === btn.dataset.sev ? null : btn.dataset.sev;
+        state.page = 1;
+        renderAll();
+      });
+    });
+
+    var catBody = document.getElementById('cat-facets');
+    catBody.innerHTML = categories.map(function(c){
+      var count = events.filter(function(e){ return e.category === c; }).length;
+      return '<button class="cat-chip' + (state.category === c ? ' active' : '') + '" data-cat="' + c + '">' + c + '<span class="cnt">' + count + '</span></button>';
+    }).join('');
+    catBody.querySelectorAll('.cat-chip').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        state.activeCard = null;
+        state.category = state.category === btn.dataset.cat ? null : btn.dataset.cat;
+        state.page = 1;
+        renderAll();
+      });
+    });
+  }
+
+  function clearFacets(rerender){
+    state.severity = null; state.category = null; state.status = ''; state.date = 'all'; state.search = ''; state.page = 1; state.activeCard = null;
+    document.getElementById('ev-status').value = '';
+    document.getElementById('ev-date').value = 'all';
+    document.getElementById('ev-search').value = '';
+    if (rerender !== false) renderAll();
+  }
+  function syncFilterInputs(){
+    document.getElementById('ev-status').value = state.status;
+    document.getElementById('ev-date').value = state.date;
+  }
+
+  // ---- Event list table ----
+  function renderList(){
+    var all = filteredEvents();
+    document.getElementById('filter-count').textContent = all.length + ' of ' + events.length + ' events';
+    var totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+    state.page = Math.min(state.page, totalPages);
+    var pageItems = all.slice((state.page - 1) * pageSize, state.page * pageSize);
+
+    var body = document.getElementById('event-body');
+    if (pageItems.length === 0){
+      body.innerHTML = '<tr><td colspan="6"><div class="empty-state">No events match these filters.</div></td></tr>';
+    } else {
+      body.innerHTML = pageItems.map(function(e){
+        var d = devices[e.device] || { name:'Unknown device' };
+        var sm = statusMeta[e.status];
+        return '<tr class="' + (e.id === state.selected ? 'selected' : '') + '" data-id="' + e.id + '">' +
+          '<td><span class="pill ' + sevClass[e.severity] + '">' + e.severity + '</span></td>' +
+          '<td class="ev-name">' + esc(e.name) + '</td>' +
+          '<td><div class="ev-device"><span class="dn">' + esc(d.name) + '</span><span class="di">' + e.device + '</span></div></td>' +
+          '<td>' + e.category + '</td>' +
+          '<td class="mono tabular">' + minutesAgoLabel(e.minAgo) + '</td>' +
+          '<td><span class="pill ' + sm.cls + '">' + sm.label + '</span></td>' +
+        '</tr>';
+      }).join('');
+    }
+    body.querySelectorAll('tr[data-id]').forEach(function(row){
+      row.addEventListener('click', function(){ state.selected = row.dataset.id; renderAll(); });
+    });
+
+    document.getElementById('list-hint').textContent = all.length + ' total';
+    document.getElementById('pg-summary').innerHTML = all.length === 0 ? '0 of 0' :
+      ((state.page - 1) * pageSize + 1) + '–' + Math.min(state.page * pageSize, all.length) + ' of <span class="tabular">' + all.length + '</span>';
+    document.getElementById('pg-cur').textContent = state.page;
+    document.getElementById('pg-prev').disabled = state.page <= 1;
+    document.getElementById('pg-next').disabled = state.page >= totalPages;
+  }
+
+  // ---- Event detail panel ----
+  function findEvent(id){ return events.filter(function(e){ return e.id === id; })[0]; }
+
+  function renderDetail(){
+    var e = findEvent(state.selected) || filteredEvents()[0];
+    var panel = document.getElementById('event-detail');
+    if (!e){ panel.innerHTML = '<div class="empty-state">Select an event to see details.</div>'; return; }
+    var d = devices[e.device] || { name:'Unknown device', zone:'—', comm:'good', power:'good', lastComm:'—' };
+    var sm = statusMeta[e.status];
+
+    var actionButtons = '';
+    if (e.status === 'new'){
+      actionButtons += '<button class="primary-btn" data-act="ack">Acknowledge</button>';
+    }
+    if (e.status === 'ack' || e.status === 'new'){
+      actionButtons += '<button class="ghost-btn" data-act="assign">Assign</button>';
+    }
+    if (e.status === 'ack' || e.status === 'assigned'){
+      actionButtons += '<button class="ghost-btn" data-act="resolve">Mark Resolved</button>';
+    }
+    if (e.status === 'resolved'){
+      actionButtons += '<button class="ghost-btn" data-act="reopen">Reopen</button>';
+    }
+
+    panel.innerHTML =
+      '<div class="ev-detail-head">' +
+        '<div class="evh-top"><span class="pill ' + sevClass[e.severity] + '">' + e.severity + '</span><span class="pill ' + sm.cls + '">' + sm.label + '</span>' +
+          (e.assignedTo ? '<span class="pill info">' + e.assignedTo + '</span>' : '') + '</div>' +
+        '<h3>' + esc(e.name) + '</h3>' +
+        '<div class="evh-meta">' + e.id + ' · ' + e.category + ' · ' + minutesAgoLabel(e.minAgo) + '</div>' +
+      '</div>' +
+      '<div class="ev-section">' +
+        '<div class="ev-section-title">Device Context</div>' +
+        '<div class="device-context">' +
+          '<div><div style="font-weight:700; font-size:12.6px;">' + esc(d.name) + '</div><div class="mono" style="font-size:11px; color:var(--text-3);">' + e.device + ' · ' + d.zone + '</div></div>' +
+          '<a class="ghost-btn" href="https://claude.ai/code/artifact/6f40726f-037c-4043-bbda-c2812cd98807" style="text-decoration:none;">Open Device →</a>' +
+        '</div>' +
+        '<dl class="ev-meta-grid" style="margin-top:12px;">' +
+          '<div class="ev-meta-item"><dt>Communication</dt><dd class="' + (d.comm === 'good' ? '' : '') + '">' +
+            '<span class="pill ' + (d.comm === 'good' ? 'good' : 'crit') + '">' + (d.comm === 'good' ? 'Communicating' : 'Not Communicating') + '</span></dd></div>' +
+          '<div class="ev-meta-item"><dt>Power</dt><dd><span class="pill ' + (d.power === 'good' ? 'good' : 'warn') + '">' + (d.power === 'good' ? 'Up' : 'Down') + '</span></dd></div>' +
+          '<div class="ev-meta-item"><dt>Last Communication</dt><dd class="mono">' + d.lastComm + '</dd></div>' +
+          '<div class="ev-meta-item"><dt>Occurred</dt><dd class="mono">' + minutesAgoLabel(e.minAgo) + '</dd></div>' +
+        '</dl>' +
+      '</div>' +
+      '<div class="ev-section">' +
+        '<div class="ev-section-title">Actions</div>' +
+        '<div class="ev-actions">' + actionButtons + '</div>' +
+        '<div class="assign-row" id="assign-row" hidden>' +
+          '<select id="assign-select"><option>N. Kumar</option><option>A. Chhaya</option><option>Piyasha D.</option><option>Sudipta M.</option></select>' +
+          '<button class="primary-btn" data-act="confirm-assign">Confirm</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ev-section">' +
+        '<div class="ev-section-title">Notes</div>' +
+        '<div class="note-list">' + (e.notes.length === 0 ? '<div class="empty-state" style="padding:10px;">No notes yet.</div>' :
+          e.notes.map(function(n){ return '<div class="note-item"><span class="na">' + n.author + '</span><span class="nt">' + n.time + '</span><div class="nb">' + esc(n.text) + '</div></div>'; }).join('')) +
+        '</div>' +
+        '<div class="note-input"><textarea id="note-text" placeholder="Add investigation notes…"></textarea><button class="ghost-btn" data-act="note">Save</button></div>' +
+      '</div>';
+
+    panel.querySelectorAll('[data-act]').forEach(function(btn){
+      btn.addEventListener('click', function(){ handleAction(e, btn.dataset.act); });
+    });
+  }
+
+  function handleAction(e, act){
+    if (act === 'ack'){ e.status = 'ack'; }
+    else if (act === 'assign'){ document.getElementById('assign-row').hidden = false; return; }
+    else if (act === 'confirm-assign'){ e.assignedTo = document.getElementById('assign-select').value; e.status = 'assigned'; }
+    else if (act === 'resolve'){ e.status = 'resolved'; }
+    else if (act === 'reopen'){ e.status = 'ack'; }
+    else if (act === 'note'){
+      var ta = document.getElementById('note-text');
+      var text = ta.value.trim();
+      if (!text) return;
+      e.notes.unshift({ author:'N. Kumar', time:'just now', text:text });
+    }
+    renderAll();
+  }
+
+  function renderAll(){
+    renderStats();
+    renderFacets();
+    renderList();
+    renderDetail();
+  }
+
+  // ---- Filter bar wiring ----
+  document.getElementById('ev-search').addEventListener('input', function(e){ state.search = e.target.value; state.page = 1; renderList(); renderDetail(); });
+  document.getElementById('ev-status').addEventListener('change', function(e){ state.status = e.target.value; state.activeCard = null; state.page = 1; renderAll(); });
+  document.getElementById('ev-date').addEventListener('change', function(e){ state.date = e.target.value; state.activeCard = null; state.page = 1; renderAll(); });
+  document.getElementById('clear-filters').addEventListener('click', function(){ clearFacets(true); });
+  document.getElementById('pg-prev').addEventListener('click', function(){ state.page = Math.max(1, state.page - 1); renderList(); });
+  document.getElementById('pg-next').addEventListener('click', function(){ state.page = state.page + 1; renderList(); });
+
+  // ---- Sidebar accordion ----
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.nav-toggle');
+    if (!btn) return;
+    var expanded = btn.getAttribute('aria-expanded') === 'true';
+    var target = document.getElementById(btn.getAttribute('aria-controls'));
+    btn.setAttribute('aria-expanded', String(!expanded));
+    if (target) target.classList.toggle('collapsed', expanded);
+    var icon = btn.querySelector('.toggle-icon');
+    if (icon) icon.textContent = expanded ? '+' : '−';
+  });
+
+  renderAll();
+})();
+</script>

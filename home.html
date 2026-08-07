@@ -1,0 +1,836 @@
+<title>Anantya HES — Home</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg:            #F7F9FC;
+    --bg-raised:     #FFFFFF;
+    --bg-sunken:     #EEF2F8;
+    --border:        #DDE3EC;
+    --border-strong: #C7D0DE;
+    --text:          #0D1117;
+    --text-2:        #5A6478;
+    --text-3:        #8B95A8;
+    --accent:        #00B8C2;
+    --accent-dim:    #E0F9FA;
+    --accent-text:   #007A82;
+    --shadow:        0 1px 3px rgba(15,23,42,.07), 0 1px 2px rgba(15,23,42,.04);
+    --shadow-md:     0 4px 16px rgba(15,23,42,.09), 0 1px 2px rgba(15,23,42,.05);
+    --radius:        10px;
+    --radius-sm:     6px;
+
+    --status-good:        #0ca30c;
+    --status-warning:     #d98a00;
+    --status-serious:     #d2611e;
+    --status-critical:    #d03b3b;
+    --status-good-bg:     #E6F6E4;
+    --status-warning-bg:  #FCF1DA;
+    --status-serious-bg:  #FBE8DC;
+    --status-critical-bg: #FBE6E6;
+
+    --cat-1: #2a78d6;
+    --cat-2: #eb6834;
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", Menlo, monospace;
+    --nav-w: 248px;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:var(--font-sans);
+    background:var(--bg);
+    color:var(--text);
+    font-size:13.5px;
+    line-height:1.5;
+    display:flex;
+    min-height:100vh;
+  }
+  ::selection{ background:var(--accent-dim); color:var(--accent-text); }
+  a{ color:inherit; }
+  button{ font:inherit; color:inherit; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .tabular{ font-variant-numeric:tabular-nums; }
+
+  /* ---------- Sidebar (shared shell) ---------- */
+  .sidebar{
+    width:var(--nav-w); min-width:var(--nav-w); height:100vh; position:sticky; top:0;
+    overflow-y:auto; background:var(--bg-raised); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; padding:18px 0 20px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 18px 18px; border-bottom:1px solid var(--border); margin-bottom:14px; }
+  .brand-mark{
+    width:32px; height:32px; border-radius:8px; flex-shrink:0;
+    background:linear-gradient(135deg, var(--accent), var(--cat-1));
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:800; font-size:14px; letter-spacing:-.02em;
+  }
+  .brand-text .name{ font-size:13.5px; font-weight:700; letter-spacing:-.01em; }
+  .brand-text .sub{ font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:1px; }
+
+  .nav-group{ margin-bottom:2px; }
+  .nav-label{ font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); padding:14px 18px 6px; }
+  .nav-toggle{ display:flex; align-items:center; justify-content:space-between; width:100%; border:none; background:none; cursor:pointer; font-family:inherit; }
+  .nav-toggle:hover{ color:var(--text-2); }
+  .toggle-icon{
+    width:15px; height:15px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--border); border-radius:4px; font-size:11px; line-height:1; color:var(--text-3);
+    font-weight:600; font-family:var(--font-mono);
+  }
+  .nav-toggle:hover .toggle-icon{ border-color:var(--border-strong); color:var(--text-2); }
+  .nav-children.collapsed{ display:none; }
+  .nav-link{
+    display:flex; align-items:center; gap:10px; padding:7px 18px; margin:0 8px; border-radius:7px;
+    text-decoration:none; font-size:12.8px; color:var(--text-2); font-weight:500;
+    transition:background .12s, color .12s; cursor:pointer; border:none; background:none; width:calc(100% - 16px); text-align:left;
+  }
+  .nav-link svg{ width:16px; height:16px; flex-shrink:0; opacity:.85; }
+  .nav-link:hover{ background:var(--bg-sunken); color:var(--text); }
+  .nav-link.active{ background:var(--accent-dim); color:var(--accent-text); font-weight:600; }
+  .nav-link.active svg{ opacity:1; }
+  .nav-badge{
+    margin-left:auto; font-family:var(--font-mono); font-size:10px; font-weight:700; padding:1px 6px;
+    border-radius:99px; background:var(--status-critical-bg); color:var(--status-critical);
+  }
+  .nav-children{ position:relative; margin-left:29px; padding-left:9px; border-left:1px solid var(--border); display:flex; flex-direction:column; }
+  .nav-children .nav-link{ margin:0 8px 0 0; padding-left:9px; font-size:12.4px; }
+  .nav-link.stub{ color:var(--text-3); }
+  .nav-link.stub svg{ opacity:.55; }
+  .nav-link.stub:hover{ color:var(--text-2); }
+  .stub-tag{ margin-left:auto; font-size:9.5px; font-weight:600; color:var(--text-3); background:var(--bg-sunken); border:1px solid var(--border); padding:1px 6px; border-radius:99px; white-space:nowrap; }
+  .sidebar-foot{ margin-top:auto; padding:14px 18px 0; border-top:1px solid var(--border); padding-top:14px; }
+  .env-pill{ display:flex; align-items:center; gap:7px; font-size:11px; color:var(--text-3); font-family:var(--font-mono); }
+  .env-dot{ width:6px; height:6px; border-radius:50%; background:var(--status-good); flex-shrink:0; }
+
+  /* ---------- Shell / topbar ---------- */
+  .shell{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .topbar{
+    position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px;
+    padding:12px 28px; background:var(--bg); border-bottom:1px solid var(--border);
+  }
+  .search{
+    display:flex; align-items:center; gap:8px; flex:1; max-width:420px;
+    background:var(--bg-raised); border:1px solid var(--border); border-radius:8px; padding:7px 12px; color:var(--text-3);
+  }
+  .search svg{ width:15px; height:15px; flex-shrink:0; }
+  .search input{ border:none; outline:none; background:none; color:var(--text); font-size:12.8px; width:100%; font-family:var(--font-sans); }
+  .search input::placeholder{ color:var(--text-3); }
+  .search kbd{ font-family:var(--font-mono); font-size:10px; color:var(--text-3); border:1px solid var(--border); border-radius:4px; padding:1px 5px; flex-shrink:0; }
+  .cluster-select{
+    display:flex; align-items:center; gap:8px; padding:6px 10px 6px 12px; border:1px solid var(--border);
+    border-radius:8px; background:var(--bg-raised); font-size:12px; cursor:pointer; color:var(--text);
+  }
+  .cluster-select .dim{ color:var(--text-3); font-family:var(--font-mono); font-size:11px; }
+  .cluster-select svg{ width:13px; height:13px; color:var(--text-3); }
+  .topbar-right{ display:flex; align-items:center; gap:10px; margin-left:auto; }
+  .icon-btn{
+    position:relative; width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg-raised); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .icon-btn svg{ width:15px; height:15px; color:var(--text-2); }
+  .icon-btn:hover{ border-color:var(--border-strong); }
+  .icon-btn .dot{
+    position:absolute; top:-3px; right:-3px; min-width:14px; height:14px; padding:0 3px; border-radius:99px;
+    background:var(--status-critical); color:#fff; font-size:9px; font-weight:700; display:flex; align-items:center;
+    justify-content:center; font-family:var(--font-mono); border:2px solid var(--bg);
+  }
+  .user-chip{ display:flex; align-items:center; gap:8px; padding:4px 10px 4px 4px; border:1px solid var(--border); border-radius:99px; background:var(--bg-raised); cursor:pointer; }
+  .avatar{ width:24px; height:24px; border-radius:50%; background:var(--cat-1); color:#fff; font-size:10.5px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .user-chip .u-name{ font-size:12px; font-weight:600; line-height:1.15; }
+  .user-chip .u-role{ font-size:10px; color:var(--text-3); line-height:1.15; }
+
+  /* ---------- Main / page head ---------- */
+  .main{ padding:22px 28px 48px; max-width:1600px; }
+  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+  .crumb{ font-size:11px; color:var(--text-3); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+  .page-head h1{ font-size:21px; font-weight:700; letter-spacing:-.01em; }
+  .page-head .ctx{ font-size:12.3px; color:var(--text-2); margin-top:4px; font-family:var(--font-mono); }
+  .page-head .ctx b{ color:var(--text); font-weight:600; }
+  .updated{ font-size:11.5px; color:var(--text-3); display:flex; align-items:center; gap:6px; }
+  .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--status-good); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+  @media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
+
+  .card{ background:var(--bg-raised); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--border); gap:10px; }
+  .card-head h2{ font-size:13px; font-weight:700; letter-spacing:-.005em; }
+  .card-head .hint{ font-size:11px; color:var(--text-3); }
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; }
+  .pill svg{ width:9px; height:9px; }
+  .pill.good{ background:var(--status-good-bg); color:var(--status-good); }
+  .pill.warn{ background:var(--status-warning-bg); color:var(--status-warning); }
+  .pill.serious{ background:var(--status-serious-bg); color:var(--status-serious); }
+  .pill.crit{ background:var(--status-critical-bg); color:var(--status-critical); }
+  .pill.muted{ background:var(--bg-sunken); color:var(--text-3); }
+  .mono{ font-family:var(--font-mono); }
+  .ghost-btn{
+    font-size:11.5px; font-weight:600; padding:6px 12px; border-radius:7px; border:1px solid var(--border);
+    background:var(--bg-raised); cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  }
+  .ghost-btn:hover{ border-color:var(--border-strong); background:var(--bg-sunken); }
+  .ghost-btn svg{ width:13px; height:13px; }
+  .ghost-btn.risk-high{ color:var(--status-critical); border-color:var(--status-critical-bg); }
+  .ghost-btn.risk-high:hover{ background:var(--status-critical-bg); }
+  .ghost-btn.risk-med{ color:var(--status-serious); }
+
+  /* ---------- Home layout: 3 panels ---------- */
+  .home-grid{ display:grid; grid-template-columns:264px 1fr 336px; gap:16px; align-items:start; }
+
+  /* Panel 1 — device selection */
+  .panel-search{ display:flex; gap:8px; padding:12px 14px; border-bottom:1px solid var(--border); }
+  .panel-search .search{ max-width:none; padding:6px 10px; }
+  .panel-search .search input{ font-size:12px; }
+  .filter-btn{
+    flex-shrink:0; width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg-raised); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-2);
+  }
+  .filter-btn svg{ width:14px; height:14px; }
+  .tabs-full{ display:flex; border-bottom:1px solid var(--border); }
+  .tabs-full .tabx{ flex:1; border:none; background:none; padding:9px 4px; font-size:11.8px; font-weight:600; color:var(--text-3); cursor:pointer; border-bottom:2px solid transparent; }
+  .tabs-full .tabx.active{ color:var(--accent-text); border-bottom-color:var(--accent); }
+
+  .device-list{ max-height:520px; overflow-y:auto; }
+  .device-row{
+    display:flex; align-items:center; gap:10px; padding:9px 14px; border-bottom:1px solid var(--border);
+    cursor:pointer; text-align:left; width:100%; background:none; border-left:2px solid transparent;
+  }
+  .device-row:hover{ background:var(--bg-sunken); }
+  .device-row.selected{ background:var(--accent-dim); border-left-color:var(--accent); }
+  .device-thumb{
+    width:30px; height:30px; border-radius:7px; background:var(--bg-sunken); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--text-2);
+  }
+  .device-thumb svg{ width:15px; height:15px; }
+  .device-row.selected .device-thumb{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .device-meta{ min-width:0; flex:1; }
+  .device-meta .dname{ font-size:12.2px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .device-meta .did{ font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); }
+  .device-status-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+  .device-grouped{ padding:6px 0; max-height:520px; overflow-y:auto; }
+  .group-hdr{ display:flex; align-items:center; justify-content:space-between; width:100%; border:none; background:none; padding:8px 14px; cursor:pointer; font-size:11.5px; font-weight:700; color:var(--text-2); }
+  .group-hdr:hover{ color:var(--text); }
+  .group-count{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-3); font-weight:600; }
+  .group-body.collapsed{ display:none; }
+
+  .panel-pagination{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-top:1px solid var(--border); font-size:11px; color:var(--text-3); }
+  .pg-btns{ display:flex; align-items:center; gap:6px; }
+  .pg-btns button{ width:22px; height:22px; border-radius:5px; border:1px solid var(--border); background:var(--bg-raised); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .pg-btns button:disabled{ opacity:.4; cursor:default; }
+  .pg-btns button svg{ width:11px; height:11px; }
+  .pg-cur{ font-family:var(--font-mono); font-weight:700; color:var(--text); padding:0 3px; }
+
+  /* Panel 2 — selected device detail */
+  .device-detail{ min-width:0; }
+  .device-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 18px; border-bottom:1px solid var(--border); }
+  .dh-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+  .dh-avatar{
+    width:42px; height:42px; border-radius:10px; background:var(--bg-sunken); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--accent-text);
+  }
+  .dh-avatar svg{ width:21px; height:21px; }
+  .dh-name{ font-size:14.5px; font-weight:700; letter-spacing:-.005em; }
+  .dh-sub{ display:flex; align-items:center; gap:7px; margin-top:3px; flex-wrap:wrap; }
+  .dh-sub .did{ font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); }
+
+  .health-strip{ display:grid; grid-template-columns:repeat(7, 1fr); gap:0; border-bottom:1px solid var(--border); }
+  .hs-item{ padding:11px 12px; border-right:1px solid var(--border); }
+  .hs-item:last-child{ border-right:none; }
+  .hs-label{ display:block; font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--text-3); margin-bottom:5px; }
+  .hs-val{ font-size:12.5px; font-weight:700; }
+  .hs-val.good{ color:var(--status-good); }
+  .hs-val.crit{ color:var(--status-critical); }
+  .hs-val.warn{ color:var(--status-warning); }
+
+  .detail-pane{ padding:18px; }
+  .prop-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px 22px; }
+  .prop-item dt{ font-size:10.5px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:.04em; margin-bottom:3px; }
+  .prop-item dd{ font-size:12.8px; font-weight:600; font-family:var(--font-mono); }
+  .prop-item dd.plain{ font-family:var(--font-sans); font-weight:500; }
+
+  .state-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .state-chip{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border:1px solid var(--border); border-radius:8px; gap:8px; }
+  .state-chip .sc-label{ font-size:11.8px; color:var(--text-2); font-weight:500; }
+
+  .attr-group{ margin-bottom:20px; }
+  .attr-group:last-child{ margin-bottom:0; }
+  .attr-group-title{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .attr-row{ display:flex; align-items:center; justify-content:space-between; padding:8px 0; gap:12px; }
+  .attr-row .al{ font-size:12px; color:var(--text-2); }
+  .attr-row .av{ font-family:var(--font-mono); font-size:12.3px; font-weight:600; display:flex; align-items:center; gap:8px; }
+  .key-toggle{ width:22px; height:22px; border-radius:6px; border:1px solid var(--border); background:var(--bg-sunken); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-3); }
+  .key-toggle svg{ width:12px; height:12px; }
+  .security-note{ display:flex; gap:9px; background:var(--accent-dim); border:1px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:11.5px; color:var(--text-2); margin-top:14px; }
+  .security-note svg{ width:14px; height:14px; color:var(--accent-text); flex-shrink:0; margin-top:1px; }
+
+  /* Panel 3 — operations */
+  .ops-col{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .service-row{ display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border); }
+  .service-row:last-child{ border-bottom:none; }
+  .switch{ position:relative; width:30px; height:17px; border-radius:99px; background:var(--border-strong); flex-shrink:0; cursor:pointer; border:none; }
+  .switch::after{ content:""; position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%; background:#fff; transition:transform .15s; }
+  .switch.on{ background:var(--status-good); }
+  .switch.on::after{ transform:translateX(13px); }
+  .svc-meta{ flex:1; min-width:0; }
+  .svc-name{ font-size:12.3px; font-weight:700; }
+  .svc-code{ font-size:10px; color:var(--text-3); font-family:var(--font-mono); }
+  .svc-desc{ font-size:11px; color:var(--text-3); margin-top:2px; }
+
+  .ops-search{ padding:10px 14px; border-bottom:1px solid var(--border); display:flex; gap:8px; }
+  .ops-search .search{ max-width:none; padding:5px 9px; }
+  .ops-search select{
+    font-size:11.3px; border:1px solid var(--border); border-radius:7px; background:var(--bg-raised); color:var(--text); padding:0 8px;
+  }
+  .activity-groups{ max-height:640px; overflow-y:auto; }
+  .act-group-body{ padding:2px 0 6px; }
+  .act-group-body.collapsed{ display:none; }
+  .act-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 14px 8px 30px; }
+  .act-row:hover{ background:var(--bg-sunken); }
+  .act-name{ font-size:12px; color:var(--text); }
+  .risk-badge{ font-size:9px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:2px 6px; border-radius:4px; margin-left:7px; }
+  .risk-badge.low{ background:var(--status-good-bg); color:var(--status-good); }
+  .risk-badge.med{ background:var(--status-serious-bg); color:var(--status-serious); }
+  .risk-badge.high{ background:var(--status-critical-bg); color:var(--status-critical); }
+
+  @media (max-width: 1400px){
+    .home-grid{ grid-template-columns:230px 1fr 300px; }
+    .prop-grid{ grid-template-columns:repeat(2,1fr); }
+    .health-strip{ grid-template-columns:repeat(4,1fr); }
+    .hs-item:nth-child(4n){ border-right:none; }
+  }
+  @media (max-width: 1180px){
+    .home-grid{ grid-template-columns:1fr; }
+    .device-list, .device-grouped, .activity-groups{ max-height:340px; }
+  }
+  @media (max-width: 860px){
+    body{ flex-direction:column; }
+    .sidebar{ width:100%; min-width:unset; max-height:60vh; position:relative; padding:12px 0; }
+    .sidebar-foot{ display:none; }
+    .main{ padding:18px 16px 40px; }
+    .topbar{ padding:10px 16px; flex-wrap:wrap; }
+    .search{ order:1; max-width:none; flex-basis:100%; }
+    .cluster-select{ order:2; }
+    .prop-grid{ grid-template-columns:1fr 1fr; }
+    .state-grid{ grid-template-columns:1fr; }
+    .health-strip{ grid-template-columns:repeat(2,1fr); }
+    .hs-item{ border-right:1px solid var(--border); }
+    .hs-item:nth-child(2n){ border-right:none; }
+  }
+</style>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">AH</div>
+    <div class="brand-text">
+      <div class="name">Anantya HES</div>
+      <div class="sub">Admin Dashboard</div>
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <a class="nav-link" href="https://claude.ai/code/artifact/c9ace6f9-a00f-45ee-b781-044414febecf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Dashboard
+    </a>
+  </div>
+
+  <div class="nav-group">
+    <button class="nav-label nav-toggle" aria-expanded="true" aria-controls="system-children">
+      <span>System</span>
+      <span class="toggle-icon" aria-hidden="true">−</span>
+    </button>
+    <div class="nav-children" id="system-children">
+      <button class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+        Home
+      </button>
+      <a class="nav-link" href="https://claude.ai/code/artifact/01e2ee3c-f561-4d3a-b012-5656453eb095">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Events
+        <span class="nav-badge">184</span>
+      </a>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        Data
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Schedules
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Activity
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M17 14v6M14 17h6"/></svg>
+        Management
+      </button>
+      <button class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        Map
+      </button>
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a8 8 0 0 1 16 0"/><path d="M12 15 16 9"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/></svg>
+      SLA Performance <span class="stub-tag">not set up</span>
+    </button>
+    <button class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>
+      Communication Logs
+    </button>
+    <button class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+      System Settings
+    </button>
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+      System Monitoring <span class="stub-tag">not set up</span>
+    </button>
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg>
+      KPI Dashboard <span class="stub-tag">not set up</span>
+    </button>
+    <button class="nav-link stub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4"/><path d="M9 13h6M9 16.5h6M9 9.5h2"/></svg>
+      Reporting <span class="stub-tag">not set up</span>
+    </button>
+  </div>
+
+  <div class="sidebar-foot">
+    <div class="env-pill"><span class="env-dot"></span> SQA · api-cluster-02.hes.internal</div>
+  </div>
+</aside>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search device ID, serial number, name…" aria-label="Search devices" />
+      <kbd>/</kbd>
+    </div>
+    <button class="cluster-select">
+      DISCOM-04 <span class="dim">· Cluster 02/04</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="topbar-right">
+      <button class="icon-btn" aria-label="Alarms" title="184 active alarms">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="dot">184</span>
+      </button>
+      <button class="user-chip">
+        <span class="avatar">NK</span>
+        <span>
+          <div class="u-name">N. Kumar</div>
+          <div class="u-role">Supervisor</div>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="crumb">System / Home</div>
+        <h1>Home</h1>
+        <div class="ctx">DISCOM‑04 · Cluster <b>02 / 04</b> · <b class="tabular">7,48,320</b> devices onboarded</div>
+      </div>
+      <div class="updated"><span class="live-dot"></span> Live · updated 14 seconds ago</div>
+    </div>
+
+    <div class="home-grid">
+      <!-- ============ PANEL 1 — DEVICE SELECTION ============ -->
+      <aside class="card">
+        <div class="panel-search">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" placeholder="Name, serial, ID…" aria-label="Search devices" />
+          </div>
+          <button class="filter-btn" aria-label="Filter" title="Filter by device type, status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6 8v6l-4 2v-8z"/></svg>
+          </button>
+        </div>
+        <div class="tabs-full">
+          <button class="tabx active" data-devtab="list">Devices</button>
+          <button class="tabx" data-devtab="grouped">Grouped</button>
+        </div>
+
+        <div class="device-list" id="device-list"></div>
+
+        <div class="device-grouped" id="device-grouped" hidden>
+          <button class="group-hdr grp-toggle" aria-expanded="true" aria-controls="grp-north">
+            <span>North Zone</span><span class="group-count tabular">2,41,800</span>
+          </button>
+          <div class="group-body" id="grp-north">
+            <button class="device-row"><span class="device-status-dot" style="background:var(--status-good)"></span><span class="device-meta"><span class="dname">DT‑04 · Sundarpada Feeder</span><br><span class="did">HES-DL-042931</span></span></button>
+            <button class="device-row"><span class="device-status-dot" style="background:var(--status-warning)"></span><span class="device-meta"><span class="dname">DT‑29 · Nayapalli Zone</span><br><span class="did">HES-DL-291187</span></span></button>
+          </div>
+          <button class="group-hdr grp-toggle" aria-expanded="true" aria-controls="grp-east">
+            <span>East Zone</span><span class="group-count tabular">96,500</span>
+          </button>
+          <div class="group-body" id="grp-east">
+            <button class="device-row"><span class="device-status-dot" style="background:var(--status-good)"></span><span class="device-meta"><span class="dname">DT‑11 · Khandagiri Line</span><br><span class="did">HES-RF-118820</span></span></button>
+          </div>
+          <button class="group-hdr grp-toggle" aria-expanded="true" aria-controls="grp-south">
+            <span>South Zone</span><span class="group-count tabular">2,88,100</span>
+          </button>
+          <div class="group-body" id="grp-south">
+            <button class="device-row"><span class="device-status-dot" style="background:var(--status-critical)"></span><span class="device-meta"><span class="dname">DT‑07 · Patia Substation</span><br><span class="did">HES-DL-076615</span></span></button>
+          </div>
+          <button class="group-hdr grp-toggle" aria-expanded="true" aria-controls="grp-west">
+            <span>West Zone</span><span class="group-count tabular">1,21,920</span>
+          </button>
+          <div class="group-body" id="grp-west">
+            <button class="device-row"><span class="device-status-dot" style="background:var(--status-critical)"></span><span class="device-meta"><span class="dname">DT‑33 · Chandrasekharpur</span><br><span class="did">HES-RF-337204</span></span></button>
+          </div>
+        </div>
+
+        <div class="panel-pagination">
+          <span>1–5 of <span class="tabular">7,48,320</span></span>
+          <div class="pg-btns">
+            <button disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+            <span class="pg-cur">1</span>
+            <button aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ============ PANEL 2 — SELECTED DEVICE DETAILS ============ -->
+      <section class="card device-detail">
+        <div class="device-header">
+          <div class="dh-left">
+            <div class="dh-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3.2"/><path d="M12 13.5V17M9 17h6"/></svg>
+            </div>
+            <div>
+              <div class="dh-name" id="dh-name">DT‑04 · Sundarpada Feeder</div>
+              <div class="dh-sub">
+                <span class="did mono" id="dh-id">HES-DL-042931</span>
+                <span class="pill good" id="dh-active">Active</span>
+                <span class="pill crit" id="dh-alarm">1 Alarm</span>
+              </div>
+            </div>
+          </div>
+          <button class="ghost-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Edit
+          </button>
+        </div>
+
+        <!-- Health summary strip -->
+        <div class="health-strip" id="health-strip">
+          <div class="hs-item"><span class="hs-label">Communication</span><span class="hs-val good" id="hs-comm">● Communicating</span></div>
+          <div class="hs-item"><span class="hs-label">Power</span><span class="hs-val good" id="hs-power">● Up</span></div>
+          <div class="hs-item"><span class="hs-label">Active Alarms</span><span class="hs-val crit" id="hs-alarms">1</span></div>
+          <div class="hs-item"><span class="hs-label">Breaker</span><span class="hs-val" id="hs-breaker">Closed</span></div>
+          <div class="hs-item"><span class="hs-label">Clock Sync</span><span class="hs-val good" id="hs-clock">● OK</span></div>
+          <div class="hs-item"><span class="hs-label">Last Comm.</span><span class="hs-val mono" id="hs-lastcomm">2 min ago</span></div>
+          <div class="hs-item"><span class="hs-label">Overall Health</span><span class="pill good" id="hs-overall">Good</span></div>
+        </div>
+
+        <div class="tabs-full">
+          <button class="tabx active" data-dtab="properties">Properties</button>
+          <button class="tabx" data-dtab="comm">Communication</button>
+          <button class="tabx" data-dtab="states">States</button>
+          <button class="tabx" data-dtab="network">Network &amp; Security</button>
+        </div>
+
+        <div class="detail-pane" data-pane="properties">
+          <dl class="prop-grid" id="pane-properties"></dl>
+        </div>
+        <div class="detail-pane" data-pane="comm" hidden>
+          <dl class="prop-grid" id="pane-comm"></dl>
+        </div>
+        <div class="detail-pane" data-pane="states" hidden>
+          <div class="state-grid" id="pane-states"></div>
+        </div>
+        <div class="detail-pane" data-pane="network" hidden>
+          <div class="attr-group">
+            <div class="attr-group-title">Network</div>
+            <div class="attr-row"><span class="al">Frequency</span><span class="av" id="net-freq">50 Hz</span></div>
+            <div class="attr-row"><span class="al">IPv6 Address</span><span class="av" id="net-ipv6">fe80::4a2:1ff:fe23:9b12</span></div>
+            <div class="attr-row"><span class="al">Listener Port</span><span class="av" id="net-port">4059</span></div>
+          </div>
+          <div class="attr-group">
+            <div class="attr-group-title">Security</div>
+            <div class="attr-row">
+              <span class="al">Encryption Key</span>
+              <span class="av"><span class="key-val" id="key-enc" data-value="8F:2C:9A:41:D0:E7:B3:56">••••••••••••••••</span><button class="key-toggle" data-target="key-enc" aria-label="Reveal encryption key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></span>
+            </div>
+            <div class="attr-row">
+              <span class="al">Authentication Key</span>
+              <span class="av"><span class="key-val" id="key-auth" data-value="A1:73:CF:0B:5E:9D:22:F4">••••••••••••••••</span><button class="key-toggle" data-target="key-auth" aria-label="Reveal authentication key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></span>
+            </div>
+            <div class="security-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              Keys are masked by default. Reveals are scoped to Supervisor-level roles and are recorded to the audit log.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PANEL 3 — DEVICE OPERATIONS ============ -->
+      <div class="ops-col">
+        <div class="card">
+          <div class="card-head"><h2>Services</h2><span class="hint">4 of 5 active</span></div>
+          <div id="service-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Activities</h2><span class="hint">53 available</span></div>
+          <div class="ops-search">
+            <div class="search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" placeholder="Search activities…" aria-label="Search activities" />
+            </div>
+            <select aria-label="Filter by category">
+              <option>All categories</option>
+              <option>Read data</option>
+              <option>Connect / Disconnect</option>
+              <option>Configuration</option>
+              <option>Commissioning</option>
+              <option>Firmware</option>
+              <option>Reset &amp; Maintenance</option>
+            </select>
+          </div>
+          <div class="activity-groups" id="activity-groups"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  // ---------------------------------------------------------------
+  // Mock devices — same IDs used on the Overview dashboard, so the
+  // pitch reads as one consistent dataset across screens.
+  // ---------------------------------------------------------------
+  var devices = [
+    {
+      id:'HES-DL-042931', name:'DT‑04 · Sundarpada Feeder', zone:'North', type:'Three-phase', comm:'GPRS',
+      active:true, alarms:1, commState:'good', power:'good', breaker:'Closed', clock:'good', lastComm:'2 min ago', overall:'good',
+      serial:'SN-88214477', manufacturer:'Veltrix Meters Pvt. Ltd.', supplier:'Veltrix Meters Pvt. Ltd.', year:'2023',
+      firmware:'v2.4.1', rating:'5–30 A',
+      commProfile:'DLMS/COSEM Profile A', serverIp:'10.42.6.118', protocol:'DLMS/COSEM · TCP',
+      states:{ activeAlarm:true, phaseIssue:false, faulty:false, fraud:false, clockOOS:false, breakerStatus:'Normal' }
+    },
+    {
+      id:'HES-RF-118820', name:'DT‑11 · Khandagiri Line', zone:'East', type:'Three-phase', comm:'RF',
+      active:true, alarms:0, commState:'good', power:'good', breaker:'Closed', clock:'good', lastComm:'41 sec ago', overall:'good',
+      serial:'SN-71029934', manufacturer:'Orion Metering Co.', supplier:'Orion Metering Co.', year:'2022',
+      firmware:'v2.3.9', rating:'10–60 A',
+      commProfile:'DLMS/COSEM Profile A', serverIp:'10.42.6.121', protocol:'DLMS/COSEM · TCP',
+      states:{ activeAlarm:false, phaseIssue:false, faulty:false, fraud:false, clockOOS:false, breakerStatus:'Normal' }
+    },
+    {
+      id:'HES-DL-076615', name:'DT‑07 · Patia Substation', zone:'South', type:'Single-phase', comm:'GPRS',
+      active:true, alarms:1, commState:'crit', power:'warn', breaker:'Closed', clock:'crit', lastComm:'6 hr 12 min ago', overall:'crit',
+      serial:'SN-65517723', manufacturer:'Veltrix Meters Pvt. Ltd.', supplier:'Veltrix Meters Pvt. Ltd.', year:'2021',
+      firmware:'v2.1.4', rating:'5–30 A',
+      commProfile:'DLMS/COSEM Profile B', serverIp:'10.42.7.048', protocol:'DLMS/COSEM · TCP',
+      states:{ activeAlarm:true, phaseIssue:false, faulty:false, fraud:false, clockOOS:true, breakerStatus:'Normal' }
+    },
+    {
+      id:'HES-RF-337204', name:'DT‑33 · Chandrasekharpur', zone:'West', type:'Three-phase', comm:'RF',
+      active:false, alarms:1, commState:'crit', power:'crit', breaker:'Open', clock:'warn', lastComm:'1 day 3 hr ago', overall:'crit',
+      serial:'SN-90284461', manufacturer:'Orion Metering Co.', supplier:'Orion Metering Co.', year:'2020',
+      firmware:'v2.0.7', rating:'10–60 A',
+      commProfile:'DLMS/COSEM Profile A', serverIp:'10.42.7.055', protocol:'DLMS/COSEM · TCP',
+      states:{ activeAlarm:true, phaseIssue:true, faulty:false, fraud:false, clockOOS:false, breakerStatus:'Tripped' }
+    },
+    {
+      id:'HES-DL-291187', name:'DT‑29 · Nayapalli Zone', zone:'North', type:'Single-phase', comm:'GPRS',
+      active:true, alarms:0, commState:'good', power:'good', breaker:'Closed', clock:'good', lastComm:'14 sec ago', overall:'good',
+      serial:'SN-33810256', manufacturer:'Orion Metering Co.', supplier:'Orion Metering Co.', year:'2023',
+      firmware:'v2.4.1', rating:'5–30 A',
+      commProfile:'DLMS/COSEM Profile A', serverIp:'10.42.6.130', protocol:'DLMS/COSEM · TCP',
+      states:{ activeAlarm:false, phaseIssue:false, faulty:false, fraud:false, clockOOS:false, breakerStatus:'Normal' }
+    }
+  ];
+
+  var services = [
+    { code:'Active', name:'Active', desc:'Device is enrolled and eligible for scheduled reads.', on:true },
+    { code:'IncludeInSLA', name:'Include in SLA', desc:'Counts toward this utility’s SLA achievement calculation.', on:true },
+    { code:'ReadLP1', name:'Load Profile 1 Collection', desc:'Collects 30-minute interval load data.', on:true },
+    { code:'ReadLP2', name:'Load Profile 2 Collection', desc:'Collects secondary load-profile channel.', on:false },
+    { code:'ReadBP', name:'Billing Profile Collection', desc:'Collects monthly billing-cycle register snapshot.', on:true }
+  ];
+
+  var activityGroups = [
+    { name:'Read Data', risk:'low', items:['Read Instant Profile','Read Daily Profile','Read Load Profile','Read Billing Profile'] },
+    { name:'Connect / Disconnect', risk:'high', items:['Disconnect Request','Reconnect Request'] },
+    { name:'Configuration', risk:'med', items:['Demand Integration-Period Change','Load-Profile Integration-Period Change','Postpaid-Meter Configuration','Prepaid-Meter Configuration'] },
+    { name:'Commissioning', risk:'med', items:['Commissioning Enable Job'] },
+    { name:'Firmware', risk:'high', items:['Firmware Upgrade'] },
+    { name:'Reset & Maintenance', risk:'high', items:['Maximum-Demand Reset','Meter Reset'] }
+  ];
+
+  var riskLabel = { low:'Low', med:'Medium', high:'High' };
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  // ---- Device list (Panel 1) ----
+  function renderDeviceList(){
+    var el = document.getElementById('device-list');
+    el.innerHTML = devices.map(function(d, i){
+      var dot = d.commState === 'good' ? 'var(--status-good)' : (d.commState === 'warn' ? 'var(--status-warning)' : 'var(--status-critical)');
+      return '<button class="device-row' + (i === 0 ? ' selected' : '') + '" data-idx="' + i + '">' +
+        '<span class="device-status-dot" style="background:' + dot + '"></span>' +
+        '<span class="device-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3.2"/><path d="M12 13.5V17M9 17h6"/></svg></span>' +
+        '<span class="device-meta"><span class="dname">' + esc(d.name) + '</span><br><span class="did">' + d.id + '</span></span>' +
+      '</button>';
+    }).join('');
+  }
+  renderDeviceList();
+
+  // ---- Selected device workspace (Panels 2 & 3) ----
+  var healthDots = { good:'●', warn:'●', crit:'●' };
+  function healthText(state, upText, downText){
+    return healthDots[state] + ' ' + (state === 'good' ? upText : downText);
+  }
+
+  function selectDevice(idx){
+    var d = devices[idx];
+    document.querySelectorAll('.device-row').forEach(function(r, i){ r.classList.toggle('selected', i === idx); });
+
+    document.getElementById('dh-name').textContent = d.name;
+    document.getElementById('dh-id').textContent = d.id;
+    var activeEl = document.getElementById('dh-active');
+    activeEl.textContent = d.active ? 'Active' : 'Inactive';
+    activeEl.className = 'pill ' + (d.active ? 'good' : 'muted');
+    var alarmEl = document.getElementById('dh-alarm');
+    if (d.alarms > 0){ alarmEl.hidden = false; alarmEl.className = 'pill crit'; alarmEl.textContent = d.alarms + (d.alarms === 1 ? ' Alarm' : ' Alarms'); }
+    else { alarmEl.hidden = true; }
+
+    document.getElementById('hs-comm').innerHTML = healthText(d.commState, 'Communicating', 'Not Communicating');
+    document.getElementById('hs-comm').className = 'hs-val ' + d.commState;
+    document.getElementById('hs-power').innerHTML = healthText(d.power, 'Up', 'Down');
+    document.getElementById('hs-power').className = 'hs-val ' + d.power;
+    var alarmsHs = document.getElementById('hs-alarms');
+    alarmsHs.textContent = d.alarms; alarmsHs.className = 'hs-val ' + (d.alarms > 0 ? 'crit' : 'good');
+    document.getElementById('hs-breaker').textContent = d.breaker;
+    document.getElementById('hs-clock').innerHTML = healthText(d.clock, 'OK', 'Out of sync');
+    document.getElementById('hs-clock').className = 'hs-val ' + d.clock;
+    document.getElementById('hs-lastcomm').textContent = d.lastComm;
+    var overallEl = document.getElementById('hs-overall');
+    overallEl.textContent = d.overall === 'good' ? 'Good' : (d.overall === 'warn' ? 'Degraded' : 'At Risk');
+    overallEl.className = 'pill ' + d.overall;
+
+    document.getElementById('pane-properties').innerHTML = [
+      ['Device ID', d.id], ['Device Name', d.name.replace('&','&amp;')], ['Serial Number', d.serial],
+      ['Device Type', d.type], ['Current Rating', d.rating], ['Firmware Version', d.firmware],
+      ['Manufacturer', d.manufacturer, true], ['Supplier', d.supplier, true], ['Year of Manufacture', d.year]
+    ].map(propItem).join('');
+
+    document.getElementById('pane-comm').innerHTML = [
+      ['Communication Technology', d.comm], ['Communication Profile', d.commProfile, true],
+      ['Server IP', d.serverIp], ['Connection Protocol', d.protocol, true],
+      ['Communication State', d.commState === 'good' ? 'Communicating' : 'Not Communicating', true],
+      ['Zone', d.zone, true]
+    ].map(propItem).join('');
+
+    var s = d.states;
+    document.getElementById('pane-states').innerHTML = [
+      ['Active', d.active], ['Has Active Alarms', s.activeAlarm, true], ['Phase Issue', s.phaseIssue, true],
+      ['Faulty Meter', s.faulty, true], ['Fraud Attempt', s.fraud, true], ['Clock Out of Sync', s.clockOOS, true]
+    ].map(function(x){ return stateChip(x[0], x[1], x[2]); }).join('') +
+      stateChip('Breaker State', s.breakerStatus === 'Normal', false, s.breakerStatus === 'Normal' ? d.breaker : s.breakerStatus);
+
+    document.getElementById('net-freq').textContent = '50 Hz';
+  }
+
+  function propItem(pair){
+    var label = pair[0], val = pair[1], plain = pair[2];
+    return '<div class="prop-item"><dt>' + label + '</dt><dd class="' + (plain ? 'plain' : '') + '">' + esc(val) + '</dd></div>';
+  }
+  function stateChip(label, isGoodWhenTrueOrFalse, invert, overrideText){
+    // For flags like "Phase Issue" true = bad; for "Active" true = good. `invert` marks the bad-when-true ones.
+    var isBad = invert ? isGoodWhenTrueOrFalse : !isGoodWhenTrueOrFalse;
+    var text = overrideText !== undefined ? overrideText : (isGoodWhenTrueOrFalse === true || isGoodWhenTrueOrFalse === false ? (invert ? (isGoodWhenTrueOrFalse ? 'Yes' : 'No') : (isGoodWhenTrueOrFalse ? 'Yes' : 'No')) : String(isGoodWhenTrueOrFalse));
+    var cls = isBad ? 'crit' : 'good';
+    return '<div class="state-chip"><span class="sc-label">' + label + '</span><span class="pill ' + cls + '">' + text + '</span></div>';
+  }
+
+  document.getElementById('device-list').addEventListener('click', function(e){
+    var row = e.target.closest('.device-row');
+    if (!row) return;
+    selectDevice(Number(row.dataset.idx));
+  });
+
+  // ---- Services (Panel 3) ----
+  document.getElementById('service-list').innerHTML = services.map(function(s){
+    return '<div class="service-row">' +
+      '<div class="svc-meta"><div class="svc-name">' + s.name + ' <span class="svc-code">' + s.code + '</span></div><div class="svc-desc">' + s.desc + '</div></div>' +
+      '<button class="switch' + (s.on ? ' on' : '') + '" aria-label="' + s.name + (s.on ? ' enabled' : ' disabled') + '" aria-pressed="' + s.on + '"></button>' +
+    '</div>';
+  }).join('');
+  document.getElementById('service-list').addEventListener('click', function(e){
+    var sw = e.target.closest('.switch');
+    if (!sw) return;
+    sw.classList.toggle('on');
+  });
+
+  // ---- Activities (Panel 3) ----
+  document.getElementById('activity-groups').innerHTML = activityGroups.map(function(g, gi){
+    var gid = 'act-grp-' + gi;
+    return '<button class="group-hdr grp-toggle" aria-expanded="true" aria-controls="' + gid + '">' +
+        '<span>' + g.name + ' <span class="risk-badge ' + g.risk + '">' + riskLabel[g.risk] + ' risk</span></span>' +
+        '<span class="group-count tabular">' + g.items.length + '</span>' +
+      '</button>' +
+      '<div class="act-group-body" id="' + gid + '">' +
+        g.items.map(function(a){
+          var btnCls = g.risk === 'high' ? 'risk-high' : (g.risk === 'med' ? 'risk-med' : '');
+          return '<div class="act-row"><span class="act-name">' + a + '</span><button class="ghost-btn ' + btnCls + '">Execute</button></div>';
+        }).join('') +
+      '</div>';
+  }).join('');
+
+  // ---- Generic accordion toggles (sidebar System group, grouped devices, activity groups) ----
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.nav-toggle, .grp-toggle');
+    if (!btn) return;
+    var expanded = btn.getAttribute('aria-expanded') === 'true';
+    var target = document.getElementById(btn.getAttribute('aria-controls'));
+    btn.setAttribute('aria-expanded', String(!expanded));
+    if (target) target.classList.toggle('collapsed', expanded);
+    var icon = btn.querySelector('.toggle-icon');
+    if (icon) icon.textContent = expanded ? '+' : '−';
+  });
+
+  // ---- Devices / Grouped tab switch ----
+  document.querySelectorAll('[data-devtab]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('[data-devtab]').forEach(function(t){ t.classList.remove('active'); });
+      btn.classList.add('active');
+      var isGrouped = btn.dataset.devtab === 'grouped';
+      document.getElementById('device-list').hidden = isGrouped;
+      document.getElementById('device-grouped').hidden = !isGrouped;
+    });
+  });
+
+  // ---- Properties / Communication / States / Network tab switch ----
+  document.querySelectorAll('[data-dtab]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('[data-dtab]').forEach(function(t){ t.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.detail-pane').forEach(function(p){ p.hidden = p.dataset.pane !== btn.dataset.dtab; });
+    });
+  });
+
+  // ---- Masked key reveal ----
+  document.querySelectorAll('.key-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var span = document.getElementById(btn.dataset.target);
+      var revealed = span.dataset.revealed === 'true';
+      span.textContent = revealed ? '••••••••••••••••' : span.dataset.value;
+      span.dataset.revealed = String(!revealed);
+    });
+  });
+
+  // ---- Init with first device selected ----
+  selectDevice(0);
+})();
+</script>
