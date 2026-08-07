@@ -2,13 +2,19 @@
 
 Static HTML/CSS/JS mockups for the redesigned Anantya HES (Head-End System) admin dashboard, prepared by Redmelon for the Gridcrest Technology pitch.
 
-These are pre-implementation visual/interaction mockups — self-contained HTML files with no build step. Open any file directly in a browser to view it.
+**Live:** https://anantya-hes-pitch.pages.dev (hosted on Cloudflare Pages, deployed from this private repo — the repo itself stays private, the preview link is what gets shared)
+
+These are self-contained HTML files with no build step. Open any file directly in a browser to view it locally, or just use the live link above.
 
 ## Pages
 
-- [`dashboard.html`](dashboard.html) — Operations Overview: fleet-wide KPIs, alarms by severity, recent events, communication health, data collection trend, top devices with alarms.
-- [`home.html`](home.html) — System → Home: device explorer with search/filter, selected-device workspace (properties, communication, states, network & security), services, and risk-tagged activities.
-- [`events.html`](events.html) — System → Events: filterable event list with live summary stats, severity/category facets, and a full acknowledge → assign → resolve workflow.
+- [`dashboard.html`](dashboard.html) — Operations Overview: fleet-wide KPIs, alarms by severity, recent events, communication health, data collection trend, top devices with alarms. The alarm badge count reads live from Events' data.
+- [`home.html`](home.html) — System → Home: device explorer with search/filter, selected-device workspace (properties, communication, states, network & security), services (toggles persist), and risk-tagged activities (Execute runs a real Waiting → Executing → Success/Failed cycle).
+- [`events.html`](events.html) — System → Events: filterable event list with live summary stats, severity/category facets, and a full Acknowledge → Assign → Resolve → Reopen workflow with notes. Use "Reset demo data" to restore the original seed data at any time.
+
+## Persistence
+
+Event and service-toggle changes are saved to the browser's `localStorage` (keys `hes-demo-events-v1` / `hes-demo-services-v1`), so they survive a reload and stay consistent across pages. This is demo-only persistence — per-browser, not shared between viewers, and not backed by any real database.
 
 ## Status
 
