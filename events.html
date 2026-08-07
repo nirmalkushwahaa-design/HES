@@ -231,7 +231,7 @@
   </div>
 
   <div class="nav-group">
-    <a class="nav-link" href="https://claude.ai/code/artifact/c9ace6f9-a00f-45ee-b781-044414febecf">
+    <a class="nav-link" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       Dashboard
     </a>
@@ -242,7 +242,7 @@
       <span>System</span><span class="toggle-icon" aria-hidden="true">−</span>
     </button>
     <div class="nav-children" id="system-children">
-      <a class="nav-link" href="https://claude.ai/code/artifact/6f40726f-037c-4043-bbda-c2812cd98807">
+      <a class="nav-link" href="home.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
         Home
       </a>
@@ -365,6 +365,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m-9 0v14a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6"/></svg>
           Clear filters
         </button>
+        <button class="ghost-btn" id="reset-demo" title="Restore the original demo events, discarding any Acknowledge/Assign/Resolve/Note changes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          Reset demo data
+        </button>
       </div>
 
       <div class="facet-wrap">
@@ -437,7 +441,7 @@
     return { id:'EVT-' + String(seq++).padStart(4,'0'), name:name, category:category, severity:severity,
       status:status, device:device, minAgo:minAgo, assignedTo:assignedTo || null, notes:[] };
   }
-  var events = [
+  var defaultEvents = [
     ev('Power Failure', 'Power Alert', 'Critical', 'new', 'HES-DL-042931', 3),
     ev('Tamper Detected', 'Tampering', 'Critical', 'new', 'HES-RF-118820', 19),
     ev('Communication Loss', 'Device Data', 'Major', 'ack', 'HES-RF-337204', 61, null),
@@ -459,6 +463,23 @@
     ev('Meter Switched On', 'Device Data', 'Info', 'new', 'HES-DL-076615', 1600),
     ev('Cover Open', 'Tampering', 'Major', 'new', 'HES-DL-042931', 2000)
   ];
+
+  // ---- Persistence: events (with any Acknowledge/Assign/Resolve/Note changes) survive a reload ----
+  var STORE_KEY = 'hes-demo-events-v1';
+  function cloneDefaults(){ return JSON.parse(JSON.stringify(defaultEvents)); }
+  function loadEvents(){
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return cloneDefaults();
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.length === 0) return cloneDefaults();
+      return parsed;
+    } catch (e) { return cloneDefaults(); }
+  }
+  function persistEvents(){
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(events)); } catch (e) {}
+  }
+  var events = loadEvents();
 
   var state = { search:'', severity:null, category:null, status:'', date:'all', page:1, selected:events[0].id };
   var pageSize = 8;
@@ -639,7 +660,7 @@
         '<div class="ev-section-title">Device Context</div>' +
         '<div class="device-context">' +
           '<div><div style="font-weight:700; font-size:12.6px;">' + esc(d.name) + '</div><div class="mono" style="font-size:11px; color:var(--text-3);">' + e.device + ' · ' + d.zone + '</div></div>' +
-          '<a class="ghost-btn" href="https://claude.ai/code/artifact/6f40726f-037c-4043-bbda-c2812cd98807" style="text-decoration:none;">Open Device →</a>' +
+          '<a class="ghost-btn" href="home.html" style="text-decoration:none;">Open Device →</a>' +
         '</div>' +
         '<dl class="ev-meta-grid" style="margin-top:12px;">' +
           '<div class="ev-meta-item"><dt>Communication</dt><dd class="' + (d.comm === 'good' ? '' : '') + '">' +
@@ -682,6 +703,7 @@
       if (!text) return;
       e.notes.unshift({ author:'N. Kumar', time:'just now', text:text });
     }
+    persistEvents();
     renderAll();
   }
 
@@ -697,6 +719,13 @@
   document.getElementById('ev-status').addEventListener('change', function(e){ state.status = e.target.value; state.activeCard = null; state.page = 1; renderAll(); });
   document.getElementById('ev-date').addEventListener('change', function(e){ state.date = e.target.value; state.activeCard = null; state.page = 1; renderAll(); });
   document.getElementById('clear-filters').addEventListener('click', function(){ clearFacets(true); });
+  document.getElementById('reset-demo').addEventListener('click', function(){
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    events = cloneDefaults();
+    persistEvents();
+    state.selected = events[0].id;
+    renderAll();
+  });
   document.getElementById('pg-prev').addEventListener('click', function(){ state.page = Math.max(1, state.page - 1); renderList(); });
   document.getElementById('pg-next').addEventListener('click', function(){ state.page = state.page + 1; renderList(); });
 

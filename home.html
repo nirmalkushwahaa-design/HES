@@ -287,6 +287,14 @@
   .act-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 14px 8px 30px; }
   .act-row:hover{ background:var(--bg-sunken); }
   .act-name{ font-size:12px; color:var(--text); }
+  .act-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .act-last{ font-size:10.5px; color:var(--text-3); white-space:nowrap; }
+  .exec-btn{ min-width:64px; text-align:center; }
+  .exec-btn[disabled]{ cursor:default; opacity:.75; }
+  .exec-btn.state-waiting{ color:var(--text-3); }
+  .exec-btn.state-executing{ color:var(--status-warning); border-color:var(--status-warning-bg); }
+  .exec-btn.state-success{ color:var(--status-good); border-color:var(--status-good-bg); background:var(--status-good-bg); }
+  .exec-btn.state-failed{ color:var(--status-critical); border-color:var(--status-critical-bg); background:var(--status-critical-bg); }
   .risk-badge{ font-size:9px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:2px 6px; border-radius:4px; margin-left:7px; }
   .risk-badge.low{ background:var(--status-good-bg); color:var(--status-good); }
   .risk-badge.med{ background:var(--status-serious-bg); color:var(--status-serious); }
@@ -328,7 +336,7 @@
   </div>
 
   <div class="nav-group">
-    <a class="nav-link" href="https://claude.ai/code/artifact/c9ace6f9-a00f-45ee-b781-044414febecf">
+    <a class="nav-link" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       Dashboard
     </a>
@@ -344,7 +352,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
         Home
       </button>
-      <a class="nav-link" href="https://claude.ai/code/artifact/01e2ee3c-f561-4d3a-b012-5656453eb095">
+      <a class="nav-link" href="events.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         Events
         <span class="nav-badge">184</span>
@@ -574,7 +582,7 @@
       <!-- ============ PANEL 3 — DEVICE OPERATIONS ============ -->
       <div class="ops-col">
         <div class="card">
-          <div class="card-head"><h2>Services</h2><span class="hint">4 of 5 active</span></div>
+          <div class="card-head"><h2>Services</h2><span class="hint" id="svc-count">4 of 5 active</span></div>
           <div id="service-list"></div>
         </div>
 
@@ -651,13 +659,26 @@
     }
   ];
 
-  var services = [
+  var defaultServices = [
     { code:'Active', name:'Active', desc:'Device is enrolled and eligible for scheduled reads.', on:true },
     { code:'IncludeInSLA', name:'Include in SLA', desc:'Counts toward this utility’s SLA achievement calculation.', on:true },
     { code:'ReadLP1', name:'Load Profile 1 Collection', desc:'Collects 30-minute interval load data.', on:true },
     { code:'ReadLP2', name:'Load Profile 2 Collection', desc:'Collects secondary load-profile channel.', on:false },
     { code:'ReadBP', name:'Billing Profile Collection', desc:'Collects monthly billing-cycle register snapshot.', on:true }
   ];
+
+  // ---- Persistence: service on/off toggles survive a reload ----
+  var SVC_STORE_KEY = 'hes-demo-services-v1';
+  var services;
+  try {
+    var storedSvc = JSON.parse(localStorage.getItem(SVC_STORE_KEY) || 'null');
+    services = (Array.isArray(storedSvc) && storedSvc.length === defaultServices.length)
+      ? defaultServices.map(function(s, i){ return Object.assign({}, s, { on: storedSvc[i] ? storedSvc[i].on : s.on }); })
+      : defaultServices.map(function(s){ return Object.assign({}, s); });
+  } catch (e) { services = defaultServices.map(function(s){ return Object.assign({}, s); }); }
+  function persistServices(){
+    try { localStorage.setItem(SVC_STORE_KEY, JSON.stringify(services.map(function(s){ return { code:s.code, on:s.on }; }))); } catch (e) {}
+  }
 
   var activityGroups = [
     { name:'Read Data', risk:'low', items:['Read Instant Profile','Read Daily Profile','Read Load Profile','Read Billing Profile'] },
@@ -761,19 +782,29 @@
   });
 
   // ---- Services (Panel 3) ----
-  document.getElementById('service-list').innerHTML = services.map(function(s){
-    return '<div class="service-row">' +
-      '<div class="svc-meta"><div class="svc-name">' + s.name + ' <span class="svc-code">' + s.code + '</span></div><div class="svc-desc">' + s.desc + '</div></div>' +
-      '<button class="switch' + (s.on ? ' on' : '') + '" aria-label="' + s.name + (s.on ? ' enabled' : ' disabled') + '" aria-pressed="' + s.on + '"></button>' +
-    '</div>';
-  }).join('');
+  function renderServices(){
+    document.getElementById('service-list').innerHTML = services.map(function(s){
+      return '<div class="service-row">' +
+        '<div class="svc-meta"><div class="svc-name">' + s.name + ' <span class="svc-code">' + s.code + '</span></div><div class="svc-desc">' + s.desc + '</div></div>' +
+        '<button class="switch' + (s.on ? ' on' : '') + '" data-code="' + s.code + '" aria-label="' + s.name + (s.on ? ' enabled' : ' disabled') + '" aria-pressed="' + s.on + '"></button>' +
+      '</div>';
+    }).join('');
+    var activeCount = services.filter(function(s){ return s.on; }).length;
+    document.getElementById('svc-count').textContent = activeCount + ' of ' + services.length + ' active';
+  }
+  renderServices();
   document.getElementById('service-list').addEventListener('click', function(e){
     var sw = e.target.closest('.switch');
     if (!sw) return;
-    sw.classList.toggle('on');
+    var svc = services.filter(function(s){ return s.code === sw.dataset.code; })[0];
+    if (!svc) return;
+    svc.on = !svc.on;
+    persistServices();
+    renderServices();
   });
 
   // ---- Activities (Panel 3) ----
+  var activitySeq = 0;
   document.getElementById('activity-groups').innerHTML = activityGroups.map(function(g, gi){
     var gid = 'act-grp-' + gi;
     return '<button class="group-hdr grp-toggle" aria-expanded="true" aria-controls="' + gid + '">' +
@@ -783,10 +814,43 @@
       '<div class="act-group-body" id="' + gid + '">' +
         g.items.map(function(a){
           var btnCls = g.risk === 'high' ? 'risk-high' : (g.risk === 'med' ? 'risk-med' : '');
-          return '<div class="act-row"><span class="act-name">' + a + '</span><button class="ghost-btn ' + btnCls + '">Execute</button></div>';
+          var aid = 'act-' + (activitySeq++);
+          return '<div class="act-row"><span class="act-name">' + a + '</span>' +
+            '<span class="act-right"><span class="act-last" id="' + aid + '-last"></span>' +
+            '<button class="ghost-btn exec-btn ' + btnCls + '" id="' + aid + '" data-name="' + esc(a) + '">Execute</button></span></div>';
         }).join('') +
       '</div>';
   }).join('');
+
+  document.getElementById('activity-groups').addEventListener('click', function(e){
+    var btn = e.target.closest('.exec-btn');
+    if (!btn || btn.disabled) return;
+    var lastEl = document.getElementById(btn.id + '-last');
+    var device = devices[document.querySelectorAll('.device-row.selected')[0] ? Number(document.querySelectorAll('.device-row.selected')[0].dataset.idx) : 0];
+    var origLabel = btn.textContent;
+    btn.disabled = true;
+
+    btn.className = btn.className.replace(/\bstate-\S+/g, '').trim() + ' state-waiting';
+    btn.textContent = 'Waiting…';
+    if (lastEl) lastEl.textContent = '';
+
+    setTimeout(function(){
+      btn.className = btn.className.replace(/\bstate-\S+/g, '').trim() + ' state-executing';
+      btn.textContent = 'Executing…';
+    }, 450);
+
+    setTimeout(function(){
+      var failed = Math.random() < 0.08; // occasional simulated failure, matching the confirmed Success/Failed lifecycle
+      btn.className = btn.className.replace(/\bstate-\S+/g, '').trim() + (failed ? ' state-failed' : ' state-success');
+      btn.textContent = failed ? 'Failed' : 'Success';
+      if (lastEl) lastEl.textContent = (failed ? '✕ Failed' : '✓ Done') + ' · ' + (device ? device.id : '') + ' · just now';
+      setTimeout(function(){
+        btn.className = btn.className.replace(/\bstate-\S+/g, '').trim();
+        btn.textContent = origLabel;
+        btn.disabled = false;
+      }, 1400);
+    }, 1500);
+  });
 
   // ---- Generic accordion toggles (sidebar System group, grouped devices, activity groups) ----
   document.addEventListener('click', function(e){
