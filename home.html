@@ -130,10 +130,9 @@
   .filter-bar{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px; padding:16px 18px; }
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:12px; font-weight:500; color:var(--muted-foreground); }
-  .search-field{ flex:1; min-width:240px; }
-  .search-field .search-inner{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:8px; padding:8px 12px; background:var(--background); }
-  .search-field .search-inner svg{ width:15px; height:15px; color:var(--muted-foreground); flex-shrink:0; }
-  .search-field input{ flex:1; border:none; outline:none; background:none; font-size:13.5px; color:var(--foreground); font-family:var(--font-sans); }
+  .search-inner{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:8px; padding:8px 12px; background:var(--background); }
+  .search-inner svg{ width:15px; height:15px; color:var(--muted-foreground); flex-shrink:0; }
+  .search-inner input{ flex:1; border:none; outline:none; background:none; font-size:13.5px; color:var(--foreground); font-family:var(--font-sans); }
   .select{ position:relative; }
   .select select{ appearance:none; border:1px solid var(--border); border-radius:8px; background:var(--background); padding:8px 30px 8px 12px; font-size:13.5px; color:var(--foreground); font-family:var(--font-sans); cursor:pointer; min-width:150px; }
   .select svg{ position:absolute; right:9px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--muted-foreground); pointer-events:none; }
@@ -141,6 +140,33 @@
   .filter-tail .btn-outline{ padding:8px 14px; box-shadow:none; }
   .link-btn{ font-size:13px; font-weight:500; color:var(--primary); background:none; border:none; cursor:pointer; }
   .link-btn:hover{ text-decoration:underline; }
+
+  .filter-bar-single{ flex-wrap:nowrap; align-items:center; }
+  .filter-bar-search{ flex:1; min-width:0; }
+  #dv-open-filters{ position:relative; flex-shrink:0; }
+  .filter-count{ display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:99px; background:var(--primary); color:var(--primary-foreground); font-size:10.5px; font-weight:700; }
+
+  /* Filters side drawer */
+  .drawer-overlay{ display:none; position:fixed; inset:0; background:oklch(21% .03 265 / .35); z-index:40; }
+  .drawer-overlay.open{ display:block; }
+  .drawer{ position:fixed; top:0; right:-420px; width:400px; max-width:90vw; height:100vh; background:var(--card); box-shadow:-8px 0 24px oklch(21% .03 265/.12); z-index:50; display:flex; flex-direction:column; transition:right .2s ease; }
+  .drawer.open{ right:0; }
+  .drawer-header{ display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .drawer-header h2{ font-size:17px; font-weight:600; }
+  .drawer-tabs{ display:flex; gap:4px; padding:0 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .drawer-tab{ padding:12px 4px; margin-right:20px; border:none; background:none; font-size:14px; font-weight:500; color:var(--muted-foreground); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
+  .drawer-tab.active{ color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+  .drawer-body{ flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px; }
+  .drawer-panel{ display:flex; flex-direction:column; gap:16px; }
+  .drawer-panel[hidden]{ display:none; }
+  .drawer-field{ display:flex; flex-direction:column; gap:6px; }
+  .drawer-field label{ font-size:13px; font-weight:500; color:var(--foreground); }
+  .drawer-field input{ border:1px solid var(--border); border-radius:8px; background:var(--background); padding:9px 12px; font-size:13.5px; color:var(--foreground); font-family:var(--font-sans); outline:none; }
+  .drawer-field input:focus{ box-shadow:0 0 0 2px color-mix(in oklch, var(--ring) 40%, transparent); }
+  .drawer-field .select select{ width:100%; min-width:0; }
+  .drawer-footer{ display:flex; align-items:center; gap:10px; padding:16px 20px; border-top:1px solid var(--border); flex-shrink:0; }
+  .drawer-footer .btn-primary,
+  .drawer-footer .btn-outline{ flex:1; justify-content:center; }
 
   /* Table toolbar */
   .table-toolbar{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-top:1px solid var(--border); }
@@ -354,69 +380,17 @@
     </div>
 
     <div class="panel">
-      <div class="filter-bar">
-        <div class="field search-field">
-          <label>Search</label>
-          <div class="search-inner">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" id="dv-search" placeholder="Search by Device ID, Name, Serial No., etc." />
-          </div>
+      <div class="filter-bar filter-bar-single">
+        <div class="search-inner filter-bar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="dv-search" placeholder="Search by Device ID, Name, Serial No., etc." />
         </div>
-        <div class="field">
-          <label>Device Group</label>
-          <div class="select">
-            <select id="dv-filter-group"><option value="">All</option></select>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="field">
-          <label>Device Type</label>
-          <div class="select">
-            <select id="dv-filter-type"><option value="">All</option></select>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="field">
-          <label>Communication Status</label>
-          <div class="select">
-            <select id="dv-filter-comm">
-              <option value="">All</option>
-              <option>Communicating</option>
-              <option>Intermittent</option>
-              <option>Not Communicating</option>
-            </select>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="field">
-          <label>Power State</label>
-          <div class="select">
-            <select id="dv-filter-power">
-              <option value="">All</option>
-              <option>Power Up</option>
-              <option>Power Down</option>
-            </select>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="field">
-          <label>Alarm Status</label>
-          <div class="select">
-            <select id="dv-filter-alarm">
-              <option value="">All</option>
-              <option value="has">Has Alarms</option>
-              <option value="none">No Alarms</option>
-            </select>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="filter-tail">
-          <button class="btn-outline">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6 8v6l-4 2v-8z"/></svg>
-            More Filters
-          </button>
-          <button class="link-btn" id="dv-clear-all">Clear All</button>
-        </div>
+        <button class="btn-outline" id="dv-open-filters">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6 8v6l-4 2v-8z"/></svg>
+          Filters
+          <span class="filter-count" id="dv-filter-count" hidden>0</span>
+        </button>
+        <button class="link-btn" id="dv-clear-all">Clear All</button>
       </div>
 
       <div class="table-toolbar">
@@ -472,6 +446,92 @@
   </main>
 </div>
 
+<div class="drawer-overlay" id="dv-drawer-overlay"></div>
+<aside class="drawer" id="dv-drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <h2>Filters</h2>
+    <button class="icon-btn" id="dv-drawer-close" aria-label="Close filters">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="drawer-tabs">
+    <button class="drawer-tab active" data-tab="general">General</button>
+    <button class="drawer-tab" data-tab="advanced">Advanced</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-panel" data-panel="general">
+      <div class="drawer-field">
+        <label>Device ID</label>
+        <input type="text" id="fd-id" placeholder="e.g. ISKUS1260722">
+      </div>
+      <div class="drawer-field">
+        <label>Device Name</label>
+        <input type="text" id="fd-name" placeholder="e.g. ME260-R2 - Sector 62">
+      </div>
+      <div class="drawer-field">
+        <label>Device Type</label>
+        <div class="select"><select id="fd-type"><option value="">All</option></select>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="drawer-field">
+        <label>Device Group</label>
+        <div class="select"><select id="fd-group"><option value="">All</option></select>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="drawer-field">
+        <label>Serial Number</label>
+        <input type="text" id="fd-serial" placeholder="e.g. US1262239">
+      </div>
+    </div>
+    <div class="drawer-panel" data-panel="advanced" hidden>
+      <div class="drawer-field">
+        <label>Communication Status</label>
+        <div class="select"><select id="fd-comm">
+          <option value="">All</option>
+          <option>Communicating</option>
+          <option>Intermittent</option>
+          <option>Not Communicating</option>
+        </select>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="drawer-field">
+        <label>Power State</label>
+        <div class="select"><select id="fd-power">
+          <option value="">All</option>
+          <option>Power Up</option>
+          <option>Power Down</option>
+        </select>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="drawer-field">
+        <label>Has Active Alarms</label>
+        <div class="select"><select id="fd-alarm">
+          <option value="">All</option>
+          <option value="has">Has Alarms</option>
+          <option value="none">No Alarms</option>
+        </select>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="drawer-field">
+        <label>Firmware Version</label>
+        <input type="text" id="fd-firmware" placeholder="e.g. V02.38.01">
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn-primary" id="dv-drawer-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      Search
+    </button>
+    <button class="btn-outline" id="dv-drawer-clear">Clear filters</button>
+  </div>
+</aside>
+
 <script>
 (function(){
   // ---- Mock device dataset ----
@@ -507,13 +567,13 @@
     });
   }
 
-  // populate group/type filters
-  var groupSel = document.getElementById('dv-filter-group');
+  // populate group/type filters (drawer)
+  var groupSel = document.getElementById('fd-group');
   GROUPS.forEach(function(g){ var o=document.createElement('option'); o.textContent=g; groupSel.appendChild(o); });
-  var typeSel = document.getElementById('dv-filter-type');
+  var typeSel = document.getElementById('fd-type');
   TYPES.forEach(function(t){ var o=document.createElement('option'); o.textContent=t; typeSel.appendChild(o); });
 
-  var state = { search:'', group:'', type:'', comm:'', power:'', alarm:'', sortKey:null, sortDir:1, page:1, perPage:25 };
+  var state = { search:'', id:'', name:'', serial:'', firmware:'', group:'', type:'', comm:'', power:'', alarm:'', sortKey:null, sortDir:1, page:1, perPage:25 };
 
   function commPill(c){
     if (c === 'Communicating') return '<span class="pill success"><span class="dot"></span>Communicating</span>';
@@ -532,6 +592,10 @@
     var s = state.search.toLowerCase();
     return devices.filter(function(d){
       if (s && d.id.toLowerCase().indexOf(s)===-1 && d.name.toLowerCase().indexOf(s)===-1 && d.serial.toLowerCase().indexOf(s)===-1) return false;
+      if (state.id && d.id.toLowerCase().indexOf(state.id.toLowerCase())===-1) return false;
+      if (state.name && d.name.toLowerCase().indexOf(state.name.toLowerCase())===-1) return false;
+      if (state.serial && d.serial.toLowerCase().indexOf(state.serial.toLowerCase())===-1) return false;
+      if (state.firmware && d.firmware.toLowerCase().indexOf(state.firmware.toLowerCase())===-1) return false;
       if (state.group && d.group !== state.group) return false;
       if (state.type && d.type !== state.type) return false;
       if (state.comm && d.comm !== state.comm) return false;
@@ -567,7 +631,7 @@
     tbody.innerHTML = pageRows.map(function(d){
       return '<tr>' +
         '<td><input type="checkbox" class="dv-row-check"></td>' +
-        '<td><a class="dev-link" href="#">' + d.id + '</a></td>' +
+        '<td><a class="dev-link" href="device-detail.html?id=' + encodeURIComponent(d.id) + '">' + d.id + '</a></td>' +
         '<td>' + d.name + '</td>' +
         '<td class="dim tabular">' + d.serial + '</td>' +
         '<td>' + d.type + '</td>' +
@@ -626,23 +690,68 @@
   }
 
   document.getElementById('dv-search').addEventListener('input', function(e){ state.search = e.target.value; state.page = 1; render(); });
-  document.getElementById('dv-filter-group').addEventListener('change', function(e){ state.group = e.target.value; state.page = 1; render(); });
-  document.getElementById('dv-filter-type').addEventListener('change', function(e){ state.type = e.target.value; state.page = 1; render(); });
-  document.getElementById('dv-filter-comm').addEventListener('change', function(e){ state.comm = e.target.value; state.page = 1; render(); });
-  document.getElementById('dv-filter-power').addEventListener('change', function(e){ state.power = e.target.value; state.page = 1; render(); });
-  document.getElementById('dv-filter-alarm').addEventListener('change', function(e){ state.alarm = e.target.value; state.page = 1; render(); });
   document.getElementById('dv-rows-per-page').addEventListener('change', function(e){ state.perPage = Number(e.target.value); state.page = 1; render(); });
-  document.getElementById('dv-clear-all').addEventListener('click', function(){
-    state.search=''; state.group=''; state.type=''; state.comm=''; state.power=''; state.alarm=''; state.page=1;
-    document.getElementById('dv-search').value='';
-    document.getElementById('dv-filter-group').value='';
-    document.getElementById('dv-filter-type').value='';
-    document.getElementById('dv-filter-comm').value='';
-    document.getElementById('dv-filter-power').value='';
-    document.getElementById('dv-filter-alarm').value='';
-    render();
-  });
   document.getElementById('dv-refresh').addEventListener('click', function(){ render(); });
+
+  function updateFilterCount(){
+    var keys = ['id','name','serial','firmware','group','type','comm','power','alarm'];
+    var n = keys.filter(function(k){ return state[k]; }).length;
+    var badge = document.getElementById('dv-filter-count');
+    badge.textContent = n;
+    badge.hidden = n === 0;
+  }
+
+  function resetAllFilters(){
+    state.search=''; state.id=''; state.name=''; state.serial=''; state.firmware='';
+    state.group=''; state.type=''; state.comm=''; state.power=''; state.alarm=''; state.page=1;
+    document.getElementById('dv-search').value='';
+    ['fd-id','fd-name','fd-serial','fd-firmware'].forEach(function(id){ document.getElementById(id).value=''; });
+    ['fd-type','fd-group','fd-comm','fd-power','fd-alarm'].forEach(function(id){ document.getElementById(id).value=''; });
+    updateFilterCount();
+    render();
+  }
+  document.getElementById('dv-clear-all').addEventListener('click', resetAllFilters);
+
+  // ---- Filters drawer ----
+  var drawer = document.getElementById('dv-drawer');
+  var drawerOverlay = document.getElementById('dv-drawer-overlay');
+  function openDrawer(){
+    drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false');
+    drawerOverlay.classList.add('open');
+  }
+  function closeDrawer(){
+    drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
+    drawerOverlay.classList.remove('open');
+  }
+  document.getElementById('dv-open-filters').addEventListener('click', openDrawer);
+  document.getElementById('dv-drawer-close').addEventListener('click', closeDrawer);
+  drawerOverlay.addEventListener('click', closeDrawer);
+
+  document.querySelectorAll('.drawer-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.drawer-tab').forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active');
+      var key = tab.dataset.tab;
+      document.querySelectorAll('.drawer-panel').forEach(function(p){ p.hidden = p.dataset.panel !== key; });
+    });
+  });
+
+  document.getElementById('dv-drawer-search').addEventListener('click', function(){
+    state.id = document.getElementById('fd-id').value.trim();
+    state.name = document.getElementById('fd-name').value.trim();
+    state.type = document.getElementById('fd-type').value;
+    state.group = document.getElementById('fd-group').value;
+    state.serial = document.getElementById('fd-serial').value.trim();
+    state.comm = document.getElementById('fd-comm').value;
+    state.power = document.getElementById('fd-power').value;
+    state.alarm = document.getElementById('fd-alarm').value;
+    state.firmware = document.getElementById('fd-firmware').value.trim();
+    state.page = 1;
+    updateFilterCount();
+    render();
+    closeDrawer();
+  });
+  document.getElementById('dv-drawer-clear').addEventListener('click', resetAllFilters);
   document.getElementById('dv-select-all').addEventListener('change', function(e){
     document.querySelectorAll('.dv-row-check').forEach(function(cb){ cb.checked = e.target.checked; });
   });
