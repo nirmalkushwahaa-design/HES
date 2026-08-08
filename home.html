@@ -78,11 +78,6 @@
   .nav-item.disabled{ cursor:default; color:var(--muted-foreground); }
   .nav-item.disabled:hover{ background:none; }
   .nav-item.disabled svg{ opacity:.55; }
-  .nav-bottom{ padding:12px; border-top:1px solid var(--sidebar-border); }
-  .collapse-btn{ display:flex; align-items:center; gap:10px; width:100%; padding:9px 12px; border-radius:8px; border:none; background:none; color:var(--muted-foreground); font-size:13px; font-weight:500; cursor:pointer; }
-  .collapse-btn:hover{ background:var(--accent); color:var(--foreground); }
-  .collapse-btn svg{ width:16px; height:16px; flex-shrink:0; }
-
   .sidebar.collapsed{ width:68px; min-width:68px; }
   .sidebar.collapsed .brand{ justify-content:center; padding:0; }
   .sidebar.collapsed .brand-name{ display:none; }
@@ -91,9 +86,6 @@
   .sidebar.collapsed .nav-item .lbl,
   .sidebar.collapsed .nav-badge,
   .sidebar.collapsed .nav-tag{ display:none; }
-  .sidebar.collapsed .collapse-btn .lbl{ display:none; }
-  .sidebar.collapsed .collapse-btn{ justify-content:center; }
-  .sidebar.collapsed .collapse-btn svg{ transform:rotate(180deg); }
 
   /* ---------- Shell / topbar ---------- */
   .shell{ flex:1; min-width:0; display:flex; flex-direction:column; }
@@ -303,13 +295,6 @@
       </a>
     </div>
   </nav>
-
-  <div class="nav-bottom">
-    <button class="collapse-btn" id="sidebar-collapse-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      <span class="lbl">Collapse</span>
-    </button>
-  </div>
 </aside>
 
 <div class="shell">
@@ -671,14 +656,12 @@
 
   // ---- Sidebar collapse ----
   var sidebar = document.getElementById('sidebar');
-  var collapseBtn = document.getElementById('sidebar-collapse-btn');
   function applyCollapsed(c){ sidebar.classList.toggle('collapsed', c); }
   applyCollapsed(localStorage.getItem('hes-sidebar-collapsed') === '1');
   function toggleCollapse(){
     var c = sidebar.classList.toggle('collapsed');
     localStorage.setItem('hes-sidebar-collapsed', c ? '1' : '0');
   }
-  collapseBtn.addEventListener('click', toggleCollapse);
   document.getElementById('topbar-hamburger').addEventListener('click', toggleCollapse);
 
   render();
