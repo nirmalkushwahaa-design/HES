@@ -85,6 +85,11 @@
   .nav-children{ border-left:1px solid var(--sidebar-border); margin-left:22px; padding-left:12px; display:flex; flex-direction:column; gap:4px; }
   .nav-children .nav-item{ padding-left:16px; }
   .nav-group.collapsed .nav-children{ display:none; }
+  .nav-section-label{ padding:4px 12px 2px; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground); }
+  .nav-section{ display:flex; flex-direction:column; gap:4px; }
+  .nav-item.disabled{ cursor:default; color:var(--muted-foreground); }
+  .nav-item.disabled:hover{ background:none; }
+  .nav-item.disabled svg{ opacity:.55; }
   .nav-bottom{ padding-top:4px; display:flex; flex-direction:column; gap:4px; }
   .sidebar.collapsed{ width:68px; min-width:68px; }
   .sidebar.collapsed .brand{ justify-content:center; padding:0; }
@@ -140,7 +145,7 @@
 
   /* KPI grid */
   .kpi-grid{ display:grid; grid-template-columns:repeat(6, 1fr); gap:16px; margin-bottom:20px; }
-  .stat-card{ border-radius:12px; border:1px solid var(--border); background:var(--card); padding:16px; box-shadow:var(--shadow-card); transition:box-shadow .15s; }
+  .stat-card{ min-width:0; border-radius:12px; border:1px solid var(--border); background:var(--card); padding:16px; box-shadow:var(--shadow-card); transition:box-shadow .15s; }
   .stat-card:hover{ box-shadow:0 4px 10px oklch(21% .03 265/.08); }
   .stat-inner{ display:flex; align-items:flex-start; gap:12px; }
   .stat-icon{ display:grid; place-items:center; width:40px; height:40px; border-radius:12px; flex-shrink:0; }
@@ -362,86 +367,87 @@
 <aside class="sidebar">
   <div class="brand">
     <img class="brand-mark" src="logo-mark.png" alt="Anantya HES logo">
-    <span class="brand-name">Anantya HES</span>
+    <span class="brand-name">HES</span>
   </div>
 
   <nav class="nav">
-    <a class="nav-item" href="dashboard.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-          <span class="lbl">Operations Overview</span>
-        </a>
+      <a class="nav-item" href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <span class="lbl">Dashboard</span>
+      </a>
 
-    <div class="nav-group" id="system-group">
-      <button class="nav-item" id="system-toggle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
-        <span class="lbl">System</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-      <div class="nav-children">
-        <a class="nav-item" href="home.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-          <span class="lbl">Devices</span>
-        </a>
-        <a class="nav-item" href="events.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M8 13h2M14 13h2M8 17h2M14 17h2"/></svg>
-          <span class="lbl">Events</span><span class="nav-badge" id="sidebar-badge">10</span>
-          <span class="nav-tag">not set up</span>
-        </a>
-        <a class="nav-item" href="data.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
-          <span class="lbl">Data</span>
-          <span class="nav-tag">not set up</span>
-        </a>
-        <a class="nav-item" href="schedules.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 14v2.2l1.6 1M16 2v4M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5M3 10h5M8 2v4"/><circle cx="16" cy="16" r="6"/></svg>
-          <span class="lbl">Schedules</span>
-          <span class="nav-tag">not set up</span>
-        </a>
-        <a class="nav-item" href="activity.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
-          <span class="lbl">Activity</span>
-          <span class="nav-tag">not set up</span>
-        </a>
-        <a class="nav-item" href="management.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
-          <span class="lbl">Management</span>
-          <span class="nav-tag">not set up</span>
-        </a>
-        <a class="nav-item" href="map.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15M9 3.236v15"/></svg>
-          <span class="lbl">Map</span>
-          <span class="nav-tag">not set up</span>
-        </a>
-      </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Operations</div>
+      <a class="nav-item" href="home.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <span class="lbl">Devices</span>
+      </a>
+      <a class="nav-item" href="events.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="lbl">Events</span><span class="nav-badge" id="sidebar-badge">10</span>
+      </a>
+      <a class="nav-item" href="data.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        <span class="lbl">Data</span>
+      </a>
+      <a class="nav-item" href="activity.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span class="lbl">Activity Monitor</span>
+      </a>
+      <a class="nav-item" href="communication-logs.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><path d="M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"/></svg>
+        <span class="lbl">Communication Logs</span>
+      </a>
+      <a class="nav-item" href="schedules.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 14v2.2l1.6 1M16 2v4M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5M3 10h5M8 2v4"/><circle cx="16" cy="16" r="6"/></svg>
+        <span class="lbl">Schedules</span>
+      </a>
+      <a class="nav-item" href="map.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15M9 3.236v15"/></svg>
+        <span class="lbl">Map</span>
+      </a>
     </div>
 
-    <div class="nav-bottom">
+    <div class="nav-section">
+      <div class="nav-section-label">Administration</div>
+      <a class="nav-item disabled" href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="lbl">Device Onboarding</span>
+        <span class="nav-tag">not set up</span>
+      </a>
+      <a class="nav-item disabled" href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        <span class="lbl">Device Templates</span>
+        <span class="nav-tag">not set up</span>
+      </a>
+      <a class="nav-item disabled" href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span class="lbl">Import Results</span>
+        <span class="nav-tag">not set up</span>
+      </a>
+      <a class="nav-item disabled" href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21 12 17l-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span class="lbl">Saved Device Queries</span>
+        <span class="nav-tag">not set up</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Platform</div>
       <a class="nav-item" href="sla-performance.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-          <span class="lbl">SLA Performance</span><span class="nav-tag">not set up</span>
-        </a>
-      <a class="nav-item" href="communication-logs.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><path d="M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"/></svg>
-          <span class="lbl">Communication Logs</span>
-          <span class="nav-tag">not set up</span>
-        </a>
-      <a class="nav-item" href="system-settings.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 10.27 7 3.34m4 9.66-1-1.73m-3 5.73 1-1.73M12 22v-2M12 2v2M14 12h8m-4.34 8.66-1-1.73M17 3.34l-1 1.73M2 12h2m16.66 5-1.73-1M20.66 7l-1.73 1M3.34 17l1.73-1M3.34 7l1.73 1"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="8"/></svg>
-          <span class="lbl">System Settings</span>
-          <span class="nav-tag">not set up</span>
-        </a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+        <span class="lbl">SLA Performance</span>
+        <span class="nav-tag">not set up</span>
+      </a>
       <a class="nav-item" href="system-monitoring.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v4M22 13v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7M8 21h8"/><circle cx="18" cy="6" r="3"/></svg>
-          <span class="lbl">System Monitoring</span><span class="nav-tag">not set up</span>
-        </a>
-      <a class="nav-item active" href="kpi-dashboard.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></svg>
-          <span class="lbl">KPI Dashboard</span><span class="nav-tag">not set up</span>
-        </a>
-      <a class="nav-item" href="reporting.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5M8 18v-2M12 18v-4M16 18v-6"/></svg>
-          <span class="lbl">Reporting</span><span class="nav-tag">not set up</span>
-        </a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v4M22 13v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7M8 21h8"/><circle cx="18" cy="6" r="3"/></svg>
+        <span class="lbl">System Monitoring</span>
+        <span class="nav-tag">not set up</span>
+      </a>
+      <a class="nav-item" href="system-settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 10.27 7 3.34m4 9.66-1-1.73m-3 5.73 1-1.73M12 22v-2M12 2v2M14 12h8m-4.34 8.66-1-1.73M17 3.34l-1 1.73M2 12h2m16.66 5-1.73-1M20.66 7l-1.73 1M3.34 17l1.73-1M3.34 7l1.73 1"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="8"/></svg>
+        <span class="lbl">Settings</span>
+      </a>
     </div>
   </nav>
 </aside>
