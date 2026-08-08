@@ -6,7 +6,7 @@ This is private, pre-deal pitch material. Open any file directly in a browser to
 
 **Live:** https://hes.nirmalkushwahaa.workers.dev (Cloudflare Worker, auto-deployed from this private repo on every push to `master`)
 
-**⚠️ Access gating status:** not yet confirmed as gated. This URL was previously taken down because it went live without any access restriction. Before sharing this link with stakeholders, confirm a Cloudflare Zero Trust Access policy is applied (Zero Trust → Access → Applications) restricting it to specific allowed emails — do not treat the link above as safe to share until that's verified.
+**Access:** intentionally open to anyone with the link — no login gate. (An earlier version of this link was taken down over the same question; as of 2026-08-08 the decision is to keep it ungated for easy stakeholder sharing. Revisit this if the content sensitivity changes.)
 
 ## Pages
 
