@@ -146,6 +146,16 @@
   #dv-open-filters{ position:relative; flex-shrink:0; }
   .filter-count{ display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:99px; background:var(--primary); color:var(--primary-foreground); font-size:10.5px; font-weight:700; }
 
+  /* Applied filter chips */
+  .applied-filters-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:0 18px 16px; }
+  .applied-filters-row[hidden]{ display:none; }
+  .filter-chips{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; flex:1; min-width:0; }
+  .filter-chip{ display:inline-flex; align-items:center; gap:6px; border-radius:99px; border:1px solid var(--border); background:var(--secondary); padding:5px 6px 5px 12px; font-size:12.5px; font-weight:500; color:var(--foreground); white-space:nowrap; }
+  .filter-chip .chip-key{ color:var(--muted-foreground); }
+  .chip-remove{ display:grid; place-items:center; width:17px; height:17px; border-radius:99px; border:none; background:none; color:var(--muted-foreground); cursor:pointer; flex-shrink:0; }
+  .chip-remove:hover{ background:var(--accent); color:var(--foreground); }
+  .chip-remove svg{ width:10px; height:10px; }
+
   /* Filters side drawer */
   .drawer-overlay{ display:none; position:fixed; inset:0; background:oklch(21% .03 265 / .35); z-index:40; }
   .drawer-overlay.open{ display:block; }
@@ -164,9 +174,6 @@
   .drawer-field input{ border:1px solid var(--border); border-radius:8px; background:var(--background); padding:9px 12px; font-size:13.5px; color:var(--foreground); font-family:var(--font-sans); outline:none; }
   .drawer-field input:focus{ box-shadow:0 0 0 2px color-mix(in oklch, var(--ring) 40%, transparent); }
   .drawer-field .select select{ width:100%; min-width:0; }
-  .drawer-footer{ display:flex; align-items:center; gap:10px; padding:16px 20px; border-top:1px solid var(--border); flex-shrink:0; }
-  .drawer-footer .btn-primary,
-  .drawer-footer .btn-outline{ flex:1; justify-content:center; }
 
   /* Table toolbar */
   .table-toolbar{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-top:1px solid var(--border); }
@@ -390,6 +397,10 @@
           Filters
           <span class="filter-count" id="dv-filter-count" hidden>0</span>
         </button>
+      </div>
+
+      <div class="applied-filters-row" id="dv-applied-filters" hidden>
+        <div class="filter-chips" id="dv-filter-chips"></div>
         <button class="link-btn" id="dv-clear-all">Clear All</button>
       </div>
 
@@ -522,13 +533,6 @@
         <input type="text" id="fd-firmware" placeholder="e.g. V02.38.01">
       </div>
     </div>
-  </div>
-  <div class="drawer-footer">
-    <button class="btn-primary" id="dv-drawer-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      Search
-    </button>
-    <button class="btn-outline" id="dv-drawer-clear">Clear filters</button>
   </div>
 </aside>
 
@@ -693,18 +697,57 @@
   document.getElementById('dv-rows-per-page').addEventListener('change', function(e){ state.perPage = Number(e.target.value); state.page = 1; render(); });
   document.getElementById('dv-refresh').addEventListener('click', function(){ render(); });
 
+  var FILTER_LABELS = {
+    id: 'Device ID', name: 'Device Name', type: 'Device Type', group: 'Device Group',
+    serial: 'Serial Number', comm: 'Communication Status', power: 'Power State',
+    alarm: 'Has Active Alarms', firmware: 'Firmware Version'
+  };
+  var ALARM_VALUE_LABELS = { has: 'Has Alarms', none: 'No Alarms' };
+  var FILTER_FIELD_IDS = {
+    id: 'fd-id', name: 'fd-name', type: 'fd-type', group: 'fd-group', serial: 'fd-serial',
+    comm: 'fd-comm', power: 'fd-power', alarm: 'fd-alarm', firmware: 'fd-firmware'
+  };
+  var FILTER_KEYS = ['id','name','serial','firmware','group','type','comm','power','alarm'];
+
+  function renderChips(){
+    var active = FILTER_KEYS.filter(function(k){ return state[k]; });
+    var row = document.getElementById('dv-applied-filters');
+    var wrap = document.getElementById('dv-filter-chips');
+    if (active.length === 0){ row.hidden = true; wrap.innerHTML = ''; return; }
+    row.hidden = false;
+    wrap.innerHTML = active.map(function(k){
+      var val = k === 'alarm' ? (ALARM_VALUE_LABELS[state[k]] || state[k]) : state[k];
+      return '<span class="filter-chip">' +
+        '<span class="chip-key">' + FILTER_LABELS[k] + ':</span> ' + val +
+        '<button class="chip-remove" data-key="' + k + '" aria-label="Remove ' + FILTER_LABELS[k] + ' filter">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+        '</button></span>';
+    }).join('');
+    wrap.querySelectorAll('.chip-remove').forEach(function(btn){
+      btn.addEventListener('click', function(){ clearFilterField(btn.dataset.key); });
+    });
+  }
+
   function updateFilterCount(){
-    var keys = ['id','name','serial','firmware','group','type','comm','power','alarm'];
-    var n = keys.filter(function(k){ return state[k]; }).length;
+    var n = FILTER_KEYS.filter(function(k){ return state[k]; }).length;
     var badge = document.getElementById('dv-filter-count');
     badge.textContent = n;
     badge.hidden = n === 0;
+    renderChips();
+  }
+
+  function clearFilterField(key){
+    state[key] = '';
+    var el = document.getElementById(FILTER_FIELD_IDS[key]);
+    if (el) el.value = '';
+    state.page = 1;
+    updateFilterCount();
+    render();
   }
 
   function resetAllFilters(){
-    state.search=''; state.id=''; state.name=''; state.serial=''; state.firmware='';
+    state.id=''; state.name=''; state.serial=''; state.firmware='';
     state.group=''; state.type=''; state.comm=''; state.power=''; state.alarm=''; state.page=1;
-    document.getElementById('dv-search').value='';
     ['fd-id','fd-name','fd-serial','fd-firmware'].forEach(function(id){ document.getElementById(id).value=''; });
     ['fd-type','fd-group','fd-comm','fd-power','fd-alarm'].forEach(function(id){ document.getElementById(id).value=''; });
     updateFilterCount();
@@ -736,22 +779,25 @@
     });
   });
 
-  document.getElementById('dv-drawer-search').addEventListener('click', function(){
-    state.id = document.getElementById('fd-id').value.trim();
-    state.name = document.getElementById('fd-name').value.trim();
-    state.type = document.getElementById('fd-type').value;
-    state.group = document.getElementById('fd-group').value;
-    state.serial = document.getElementById('fd-serial').value.trim();
-    state.comm = document.getElementById('fd-comm').value;
-    state.power = document.getElementById('fd-power').value;
-    state.alarm = document.getElementById('fd-alarm').value;
-    state.firmware = document.getElementById('fd-firmware').value.trim();
-    state.page = 1;
-    updateFilterCount();
-    render();
-    closeDrawer();
-  });
-  document.getElementById('dv-drawer-clear').addEventListener('click', resetAllFilters);
+  function bindLiveFilter(fieldId, stateKey, isSelect){
+    var el = document.getElementById(fieldId);
+    el.addEventListener(isSelect ? 'change' : 'input', function(){
+      state[stateKey] = isSelect ? el.value : el.value.trim();
+      state.page = 1;
+      updateFilterCount();
+      render();
+    });
+  }
+  bindLiveFilter('fd-id', 'id', false);
+  bindLiveFilter('fd-name', 'name', false);
+  bindLiveFilter('fd-type', 'type', true);
+  bindLiveFilter('fd-group', 'group', true);
+  bindLiveFilter('fd-serial', 'serial', false);
+  bindLiveFilter('fd-comm', 'comm', true);
+  bindLiveFilter('fd-power', 'power', true);
+  bindLiveFilter('fd-alarm', 'alarm', true);
+  bindLiveFilter('fd-firmware', 'firmware', false);
+
   document.getElementById('dv-select-all').addEventListener('change', function(e){
     document.querySelectorAll('.dv-row-check').forEach(function(cb){ cb.checked = e.target.checked; });
   });
