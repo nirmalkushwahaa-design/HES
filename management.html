@@ -1,5 +1,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
 <title>Anantya HES — Management</title>
 <style>
 
@@ -10,7 +13,7 @@
     --foreground: oklch(21% .03 265);
     --card: oklch(100% 0 0);
     --card-foreground: oklch(21% .03 265);
-    --primary: oklch(55% .21 273);
+    --primary: oklch(55% .21 207);
     --primary-foreground: oklch(99% .002 260);
     --secondary: oklch(96.8% .007 247.896);
     --muted: oklch(96.8% .007 247.896);
@@ -19,7 +22,7 @@
     --accent-foreground: oklch(28% .04 265);
     --border: oklch(92.5% .008 255);
     --input: oklch(92.5% .008 255);
-    --ring: oklch(55% .21 273);
+    --ring: oklch(55% .21 207);
     --success: oklch(68% .17 152);
     --success-foreground: oklch(99% .002 260);
     --success-soft: oklch(95% .05 152);
@@ -32,9 +35,9 @@
     --info: oklch(62% .16 250);
     --info-soft: oklch(95.5% .025 250);
     --neutral-soft: oklch(95.5% .005 260);
-    --brand-soft: oklch(95.5% .03 273);
+    --brand-soft: oklch(95.5% .03 207);
     --shadow-card: 0 1px 2px oklch(21% .03 265/.05), 0 1px 3px oklch(21% .03 265/.04);
-    --chart-1: oklch(55% .21 273);
+    --chart-1: oklch(55% .21 207);
     --chart-2: oklch(68% .17 152);
     --chart-3: oklch(62% .16 250);
     --chart-4: oklch(77% .16 70);
@@ -42,15 +45,17 @@
     --chart-orange: oklch(72% .18 55);
     --sidebar: oklch(100% 0 0);
     --sidebar-foreground: oklch(30% .03 265);
-    --sidebar-primary: oklch(55% .21 273);
-    --sidebar-accent: oklch(96.5% .02 273);
-    --sidebar-accent-foreground: oklch(45% .18 273);
+    --sidebar-primary: oklch(55% .21 207);
+    --sidebar-accent: oklch(96.5% .02 207);
+    --sidebar-accent-foreground: oklch(45% .18 207);
     --sidebar-border: oklch(93% .008 255);
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+    --font-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
     --nav-w: 292px;
   }
 
   *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  h1,h2,h3{ font-family:var(--font-heading); }
   html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   body{ font-family:var(--font-sans); background:var(--background); color:var(--foreground); font-size:14px; line-height:1.5; display:flex; min-height:100vh; -webkit-font-smoothing:antialiased; }
   ::selection{ background:var(--brand-soft); color:var(--primary); }
