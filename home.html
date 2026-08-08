@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Anantya HES — Home</title>
 <style>
   :root {
@@ -44,7 +45,7 @@
   }
 
   *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
-  html{ scroll-behavior:smooth; }
+  html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   body{
     font-family:var(--font-sans);
     background:var(--bg);
@@ -286,10 +287,13 @@
     .hs-item:nth-child(4n){ border-right:none; }
   }
   @media (max-width: 1180px){
-    .home-grid{ grid-template-columns:1fr; }
+    .home-grid{ grid-template-columns:230px 1fr; }
+    .home-grid > .ops-col{ grid-column:1 / -1; }
     .device-list, .device-grouped, .activity-groups{ max-height:340px; }
   }
   @media (max-width: 860px){
+    .home-grid{ grid-template-columns:1fr; }
+    .home-grid > .ops-col{ grid-column:auto; }
     body{ flex-direction:column; }
     .sidebar{ width:100%; min-width:unset; max-height:60vh; position:relative; }
     .main{ padding:18px 16px 40px; }
