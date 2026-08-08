@@ -81,6 +81,16 @@
   .nav-children.collapsed{ display:none; }
   .nav-children .nav-item{ padding-left:16px; }
   .nav-bottom{ padding-top:4px; display:flex; flex-direction:column; gap:4px; }
+  .sidebar.collapsed{ width:68px; min-width:68px; }
+  .sidebar.collapsed .brand{ justify-content:center; padding:0; }
+  .sidebar.collapsed .brand-name{ display:none; }
+  .sidebar.collapsed .nav-item{ justify-content:center; padding:10px; gap:0; }
+  .sidebar.collapsed .nav-item .lbl,
+  .sidebar.collapsed .nav-badge,
+  .sidebar.collapsed .nav-tag,
+  .sidebar.collapsed .nav-item .chev{ display:none; }
+  .sidebar.collapsed .nav-children{ margin-left:0; padding-left:0; border-left:none; }
+  .sidebar.collapsed .nav-children .nav-item{ padding-left:10px; }
 
   /* ---------- Shell / topbar ---------- */
   .shell{ flex:1; min-width:0; display:flex; flex-direction:column; }
@@ -402,6 +412,9 @@
 
 <div class="shell">
   <div class="topbar">
+    <button class="icon-btn" aria-label="Toggle navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </button>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="text" placeholder="Search device ID, serial number, name…" aria-label="Search devices" />
@@ -900,3 +913,21 @@
   selectDevice(0);
 })();
 </script>
+<script>
+(function(){
+  var navToggle = document.querySelector('.icon-btn[aria-label="Toggle navigation"]');
+  var sidebar = document.querySelector('.sidebar');
+  if (!navToggle || !sidebar) return;
+  document.querySelectorAll('.sidebar .nav-item').forEach(function(item){
+    var lbl = item.querySelector('.lbl');
+    if (lbl) item.title = lbl.textContent.trim();
+  });
+  function apply(collapsed){ sidebar.classList.toggle('collapsed', collapsed); }
+  apply(localStorage.getItem('hes-sidebar-collapsed') === '1');
+  navToggle.addEventListener('click', function(){
+    var collapsed = sidebar.classList.toggle('collapsed');
+    localStorage.setItem('hes-sidebar-collapsed', collapsed ? '1' : '0');
+  });
+})();
+</script>
+
