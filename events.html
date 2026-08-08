@@ -33,7 +33,14 @@
 
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
     --font-mono: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
-    --nav-w: 240px;
+    --nav-w: 292px;
+
+    /* sidebar-only tokens, matching dashboard.html's --sidebar-* / --muted / --primary-foreground */
+    --sidebar-fg:        oklch(30% .03 265);
+    --sidebar-active-bg: oklch(96.5% .02 273);
+    --sidebar-border:    oklch(93% .008 255);
+    --nav-tag-bg:        oklch(96.8% .007 247.896);
+    --primary-fg:        oklch(99% .002 260);
   }
 
   *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
@@ -45,34 +52,25 @@
   :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
   .tabular{ font-variant-numeric:tabular-nums; }
 
-  /* ---------- Sidebar (shared shell) ---------- */
-  .sidebar{ width:var(--nav-w); min-width:var(--nav-w); height:100vh; position:sticky; top:0; overflow-y:auto; background:var(--bg-raised); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:18px 0 20px; }
-  .brand{ display:flex; align-items:center; gap:10px; padding:0 18px 18px; border-bottom:1px solid var(--border); margin-bottom:14px; }
-  .brand-mark{ width:32px; height:32px; border-radius:8px; flex-shrink:0; background:linear-gradient(135deg, var(--accent), var(--cat-1)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px; letter-spacing:-.02em; }
-  .brand-text .name{ font-size:13.5px; font-weight:700; letter-spacing:-.01em; }
-  .brand-text .sub{ font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:1px; }
-  .nav-group{ margin-bottom:2px; }
-  .nav-label{ font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); padding:14px 18px 6px; }
-  .nav-toggle{ display:flex; align-items:center; justify-content:space-between; width:100%; border:none; background:none; cursor:pointer; font-family:inherit; }
-  .nav-toggle:hover{ color:var(--text-2); }
-  .toggle-icon{ width:15px; height:15px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:4px; font-size:11px; line-height:1; color:var(--text-3); font-weight:600; font-family:var(--font-mono); }
-  .nav-toggle:hover .toggle-icon{ border-color:var(--border-strong); color:var(--text-2); }
+  /* ---------- Sidebar (canonical, matches dashboard.html) ---------- */
+  .sidebar{ width:var(--nav-w); min-width:var(--nav-w); height:100vh; position:sticky; top:0; display:flex; flex-direction:column; border-right:1px solid var(--sidebar-border); background:var(--bg-raised); color:var(--sidebar-fg); }
+  .brand{ display:flex; height:68px; align-items:center; gap:12px; border-bottom:1px solid var(--sidebar-border); padding:0 16px; flex-shrink:0; }
+  .brand-mark{ display:grid; place-items:center; width:36px; height:36px; border-radius:8px; border:1px dashed color-mix(in oklch, var(--accent) 50%, transparent); background:var(--accent-dim); color:var(--accent); font-size:11px; font-weight:700; letter-spacing:.08em; flex-shrink:0; }
+  .brand-name{ font-size:15px; font-weight:600; letter-spacing:-.01em; }
+  .nav{ flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:4px; }
+  .nav-item{ display:flex; width:100%; align-items:center; gap:12px; border-radius:8px; padding:10px 12px; font-size:14px; font-weight:500; color:var(--sidebar-fg); background:none; border:none; cursor:pointer; transition:background-color .15s,color .15s; text-align:left; text-decoration:none; }
+  .nav-item:hover{ background:var(--bg-sunken); }
+  .nav-item.active{ background:var(--sidebar-active-bg); color:var(--accent-text); font-weight:600; }
+  .nav-item svg{ width:18px; height:18px; flex-shrink:0; }
+  .nav-item .lbl{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nav-item .chev{ width:16px; height:16px; color:var(--text-3); transition:transform .15s; flex-shrink:0; }
+  #system-toggle[aria-expanded="false"] .chev{ transform:rotate(-90deg); }
+  .nav-badge{ margin-left:auto; font-size:10px; font-weight:700; background:var(--accent); color:var(--primary-fg); border-radius:99px; padding:1px 6px; }
+  .nav-tag{ margin-left:auto; font-size:9px; font-weight:600; color:var(--text-3); background:var(--nav-tag-bg); border:1px solid var(--border); padding:1px 5px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
+  .nav-children{ border-left:1px solid var(--sidebar-border); margin-left:22px; padding-left:12px; display:flex; flex-direction:column; gap:4px; }
   .nav-children.collapsed{ display:none; }
-  .nav-link{ display:flex; align-items:center; gap:10px; padding:7px 18px; margin:0 8px; border-radius:7px; text-decoration:none; font-size:12.8px; color:var(--text-2); font-weight:500; transition:background .12s, color .12s; cursor:pointer; border:none; background:none; width:calc(100% - 16px); text-align:left; }
-  .nav-link svg{ width:16px; height:16px; flex-shrink:0; opacity:.85; }
-  .nav-link:hover{ background:var(--bg-sunken); color:var(--text); }
-  .nav-link.active{ background:var(--accent-dim); color:var(--accent-text); font-weight:600; }
-  .nav-link.active svg{ opacity:1; }
-  .nav-badge{ margin-left:auto; font-family:var(--font-mono); font-size:10px; font-weight:700; padding:1px 6px; border-radius:99px; background:var(--status-critical-bg); color:var(--status-critical); }
-  .nav-children{ position:relative; margin-left:29px; padding-left:9px; border-left:1px solid var(--border); display:flex; flex-direction:column; }
-  .nav-children .nav-link{ margin:0 8px 0 0; padding-left:9px; font-size:12.4px; }
-  .nav-link.stub{ color:var(--text-3); }
-  .nav-link.stub svg{ opacity:.55; }
-  .nav-link.stub:hover{ color:var(--text-2); }
-  .stub-tag{ margin-left:auto; font-size:9.5px; font-weight:600; color:var(--text-3); background:var(--bg-sunken); border:1px solid var(--border); padding:1px 6px; border-radius:99px; white-space:nowrap; }
-  .sidebar-foot{ margin-top:auto; padding:14px 18px 0; border-top:1px solid var(--border); padding-top:14px; }
-  .env-pill{ display:flex; align-items:center; gap:7px; font-size:11px; color:var(--text-3); font-family:var(--font-mono); }
-  .env-dot{ width:6px; height:6px; border-radius:50%; background:var(--status-good); flex-shrink:0; }
+  .nav-children .nav-item{ padding-left:16px; }
+  .nav-bottom{ padding-top:4px; display:flex; flex-direction:column; gap:4px; }
 
   /* ---------- Shell / topbar ---------- */
   .shell{ flex:1; min-width:0; display:flex; flex-direction:column; }
@@ -214,8 +212,7 @@
   }
   @media (max-width: 860px){
     body{ flex-direction:column; }
-    .sidebar{ width:100%; min-width:unset; max-height:60vh; position:relative; padding:12px 0; }
-    .sidebar-foot{ display:none; }
+    .sidebar{ width:100%; min-width:unset; max-height:60vh; position:relative; }
     .main{ padding:18px 16px 40px; }
     .topbar{ padding:10px 16px; flex-wrap:wrap; }
     .search{ order:1; max-width:none; flex-basis:100%; }
@@ -227,82 +224,94 @@
 
 <aside class="sidebar">
   <div class="brand">
-    <div class="brand-mark">AH</div>
-    <div class="brand-text"><div class="name">Anantya HES</div><div class="sub">Admin Dashboard</div></div>
+    <span class="brand-mark">AH</span>
+    <span class="brand-name">Anantya HES</span>
   </div>
 
-  <div class="nav-group">
-    <a class="nav-link" href="dashboard.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-      Dashboard
+  <nav class="nav">
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      <span class="lbl">Operations Overview</span>
     </a>
-  </div>
 
-  <div class="nav-group">
-    <button class="nav-label nav-toggle" aria-expanded="true" aria-controls="system-children">
-      <span>System</span><span class="toggle-icon" aria-hidden="true">−</span>
-    </button>
-    <div class="nav-children" id="system-children">
-      <a class="nav-link" href="home.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
-        Home
+    <div class="nav-group" id="system-group">
+      <button class="nav-item nav-toggle" id="system-toggle" aria-expanded="true" aria-controls="system-children">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+        <span class="lbl">System</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <div class="nav-children" id="system-children">
+        <a class="nav-item" href="home.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+          <span class="lbl">Home</span>
+        </a>
+        <a class="nav-item active" href="events.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span class="lbl">Events</span>
+          <span class="nav-badge" id="sidebar-alarm-badge">184</span>
+          <span class="nav-tag">not set up</span>
+        </a>
+        <a class="nav-item" href="data.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          <span class="lbl">Data</span>
+          <span class="nav-tag">not set up</span>
+        </a>
+        <a class="nav-item" href="schedules.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <span class="lbl">Schedules</span>
+          <span class="nav-tag">not set up</span>
+        </a>
+        <a class="nav-item" href="activity.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span class="lbl">Activity</span>
+          <span class="nav-tag">not set up</span>
+        </a>
+        <a class="nav-item" href="management.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M17 14v6M14 17h6"/></svg>
+          <span class="lbl">Management</span>
+          <span class="nav-tag">not set up</span>
+        </a>
+        <a class="nav-item" href="map.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <span class="lbl">Map</span>
+          <span class="nav-tag">not set up</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="nav-bottom">
+      <a class="nav-item" href="sla-performance.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a8 8 0 0 1 16 0"/><path d="M12 15 16 9"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/></svg>
+        <span class="lbl">SLA Performance</span>
+        <span class="nav-tag">not set up</span>
       </a>
-      <a class="nav-link active" href="events.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Events
-        <span class="nav-badge" id="sidebar-alarm-badge">184</span>
+      <a class="nav-item" href="communication-logs.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>
+        <span class="lbl">Communication Logs</span>
+        <span class="nav-tag">not set up</span>
       </a>
-      <a class="nav-link" href="data.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-        Data
+      <a class="nav-item" href="system-settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+        <span class="lbl">System Settings</span>
+        <span class="nav-tag">not set up</span>
       </a>
-      <a class="nav-link" href="schedules.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        Schedules
+      <a class="nav-item" href="system-monitoring.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+        <span class="lbl">System Monitoring</span>
+        <span class="nav-tag">not set up</span>
       </a>
-      <a class="nav-link" href="activity.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-        Activity
+      <a class="nav-item" href="kpi-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg>
+        <span class="lbl">KPI Dashboard</span>
+        <span class="nav-tag">not set up</span>
       </a>
-      <a class="nav-link" href="management.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M17 14v6M14 17h6"/></svg>
-        Management
-      </a>
-      <a class="nav-link" href="map.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg>
-        Map
+      <a class="nav-item" href="reporting.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4"/><path d="M9 13h6M9 16.5h6M9 9.5h2"/></svg>
+        <span class="lbl">Reporting</span>
+        <span class="nav-tag">not set up</span>
       </a>
     </div>
-  </div>
-
-  <div class="nav-group">
-    <a class="nav-link stub" href="sla-performance.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a8 8 0 0 1 16 0"/><path d="M12 15 16 9"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/></svg>
-      SLA Performance <span class="stub-tag">not set up</span>
-    </a>
-    <a class="nav-link" href="communication-logs.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>
-      Communication Logs
-    </a>
-    <a class="nav-link" href="system-settings.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>
-      System Settings
-    </a>
-    <a class="nav-link stub" href="system-monitoring.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
-      System Monitoring <span class="stub-tag">not set up</span>
-    </a>
-    <a class="nav-link stub" href="kpi-dashboard.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg>
-      KPI Dashboard <span class="stub-tag">not set up</span>
-    </a>
-    <a class="nav-link stub" href="reporting.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4"/><path d="M9 13h6M9 16.5h6M9 9.5h2"/></svg>
-      Reporting <span class="stub-tag">not set up</span>
-    </a>
-  </div>
-
-  <div class="sidebar-foot"><div class="env-pill"><span class="env-dot"></span> SQA · api-cluster-02.hes.internal</div></div>
+  </nav>
 </aside>
 
 <div class="shell">
