@@ -59,7 +59,7 @@
   .tabular{ font-variant-numeric:tabular-nums; }
 
   /* ---------- Sidebar (canonical, matches dashboard.html) ---------- */
-  .sidebar{ width:var(--nav-w); min-width:var(--nav-w); height:100vh; position:sticky; top:0; display:flex; flex-direction:column; border-right:1px solid var(--sidebar-border); background:var(--sidebar); color:var(--sidebar-foreground); }
+  .sidebar{ width:var(--nav-w); min-width:var(--nav-w); min-height:100vh; position:sticky; top:0; display:flex; flex-direction:column; border-right:1px solid var(--sidebar-border); background:var(--sidebar); color:var(--sidebar-foreground); }
   .brand{ display:flex; height:68px; align-items:center; gap:12px; border-bottom:1px solid var(--sidebar-border); padding:0 16px; flex-shrink:0; }
   .brand-mark{ display:grid; place-items:center; width:36px; height:36px; border-radius:8px; flex-shrink:0; overflow:hidden; }
   .brand-mark img{ width:100%; height:100%; object-fit:contain; }
@@ -126,7 +126,7 @@
   .btn-primary svg{ width:15px; height:15px; }
 
   /* Filter panel */
-  .panel{ border-radius:12px; border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow-card); overflow:hidden; }
+  .panel{ border-radius:12px; border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow-card); overflow:hidden; display:flex; flex-direction:column; }
   .filter-bar{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px; padding:16px 18px; }
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:12px; font-weight:500; color:var(--muted-foreground); }
@@ -146,6 +146,27 @@
   .filter-bar-actions{ display:flex; align-items:center; gap:10px; margin-left:auto; flex-shrink:0; }
   #dv-open-filters{ position:relative; flex-shrink:0; }
   .filter-count{ display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:99px; background:var(--primary); color:var(--primary-foreground); font-size:10.5px; font-weight:700; }
+
+  /* Columns dropdown */
+  .col-menu-wrap{ position:relative; flex-shrink:0; }
+  .col-menu{ position:absolute; top:calc(100% + 6px); right:0; width:250px; border-radius:10px; border:1px solid var(--border); background:var(--card); box-shadow:0 8px 24px oklch(21% .03 265/.14); z-index:30; overflow:hidden; }
+  .col-menu[hidden]{ display:none; }
+  .col-menu-head{ padding:12px 14px; font-size:12px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; color:var(--muted-foreground); border-bottom:1px solid var(--border); }
+  .col-menu-list{ max-height:320px; overflow-y:auto; padding:6px; }
+  .col-menu-item{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 8px; border-radius:8px; }
+  .col-menu-item:hover{ background:var(--accent); }
+  .col-menu-item span{ font-size:13.5px; }
+  .col-menu-foot{ padding:10px 14px; border-top:1px solid var(--border); }
+  .toggle-switch{ position:relative; width:34px; height:20px; border-radius:99px; border:none; background:var(--border); cursor:pointer; flex-shrink:0; padding:0; transition:background-color .15s; }
+  .toggle-switch[aria-pressed="true"]{ background:var(--primary); }
+  .toggle-switch .toggle-knob{ position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:99px; background:#fff; transition:left .15s; box-shadow:0 1px 2px oklch(21% .03 265/.25); }
+  .toggle-switch[aria-pressed="true"] .toggle-knob{ left:16px; }
+
+  /* Sticky Actions column */
+  th[data-col="actions"], td[data-col="actions"]{ position:sticky; right:0; background:var(--card); box-shadow:-1px 0 0 var(--border) inset; }
+  thead th[data-col="actions"]{ background:var(--secondary); z-index:3; }
+  tbody td[data-col="actions"]{ z-index:1; }
+  tbody tr:hover td[data-col="actions"]{ background:color-mix(in oklch, var(--accent) 60%, var(--card)); }
 
   /* Applied filter chips */
   .applied-filters-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:0 18px 16px; }
@@ -228,6 +249,15 @@
 
   @media (max-width: 1180px){
     .filter-tail{ margin-left:0; width:100%; justify-content:flex-start; }
+  }
+
+  @media (max-width: 860px){
+    body{ flex-direction:column; }
+    .sidebar{ width:100%; min-width:unset; min-height:unset; height:auto; position:relative; }
+    .nav{ max-height:50vh; }
+    .main{ padding:16px; }
+    .topbar{ padding:0 16px; gap:8px; }
+    .topbar-search{ max-width:none; }
   }
 </style>
 
@@ -366,10 +396,6 @@
       </div>
       <div class="head-actions">
         <button class="btn-outline">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
-          Customize
-        </button>
-        <button class="btn-outline">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
           Export
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><path d="m6 9 6 6 6-6"/></svg>
@@ -392,11 +418,20 @@
           <button class="icon-btn" aria-label="Refresh" id="dv-refresh">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 21v-5h5"/></svg>
           </button>
-          <button class="btn-outline" id="dv-columns">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
-            Columns
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
+          <div class="col-menu-wrap">
+            <button class="btn-outline" id="dv-columns">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
+              Columns
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="col-menu" id="dv-columns-menu" hidden>
+              <div class="col-menu-head">Toggle columns</div>
+              <div class="col-menu-list" id="dv-columns-list"></div>
+              <div class="col-menu-foot">
+                <button class="link-btn" id="dv-columns-reset">Reset to default</button>
+              </div>
+            </div>
+          </div>
           <button class="btn-outline" id="dv-open-filters">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6 8v6l-4 2v-8z"/></svg>
             Filters
@@ -414,18 +449,18 @@
         <table>
           <thead>
             <tr>
-              <th style="width:36px;"><input type="checkbox" id="dv-select-all"></th>
-              <th class="sortable" data-sort="id"><span class="sort-wrap">Device ID <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="name"><span class="sort-wrap">Device Name <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="serial"><span class="sort-wrap">Serial Number <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="type"><span class="sort-wrap">Device Type <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="group"><span class="sort-wrap">Device Group <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="comm"><span class="sort-wrap">Communication Status <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="power"><span class="sort-wrap">Power State <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="alarms"><span class="sort-wrap">Alarm Status <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th class="sortable" data-sort="lastComm"><span class="sort-wrap">Last Communication <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
-              <th>Firmware Version</th>
-              <th style="width:44px;">Actions</th>
+              <th style="width:36px;" data-col="check"><input type="checkbox" id="dv-select-all"></th>
+              <th class="sortable" data-sort="id" data-col="id"><span class="sort-wrap">Device ID <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="name" data-col="name"><span class="sort-wrap">Device Name <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="serial" data-col="serial"><span class="sort-wrap">Serial Number <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="type" data-col="type"><span class="sort-wrap">Device Type <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="group" data-col="group"><span class="sort-wrap">Device Group <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="comm" data-col="comm"><span class="sort-wrap">Communication Status <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="power" data-col="power"><span class="sort-wrap">Power State <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="alarms" data-col="alarms"><span class="sort-wrap">Alarm Status <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th class="sortable" data-sort="lastComm" data-col="lastComm"><span class="sort-wrap">Last Communication <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span></th>
+              <th data-col="firmware">Firmware Version</th>
+              <th style="width:44px;" data-col="actions">Actions</th>
             </tr>
           </thead>
           <tbody id="dv-rows"></tbody>
@@ -571,6 +606,61 @@
 
   var state = { search:'', id:'', name:'', serial:'', firmware:'', group:'', type:'', comm:'', power:'', alarm:'', sortKey:null, sortDir:1, page:1, perPage:25 };
 
+  // ---- Columns visibility ----
+  var COLUMN_DEFS = [
+    { key:'name', label:'Device Name' },
+    { key:'serial', label:'Serial Number' },
+    { key:'type', label:'Device Type' },
+    { key:'group', label:'Device Group' },
+    { key:'comm', label:'Communication Status' },
+    { key:'power', label:'Power State' },
+    { key:'alarms', label:'Alarm Status' },
+    { key:'lastComm', label:'Last Communication' },
+    { key:'firmware', label:'Firmware Version' }
+  ];
+  var visibleCols = {};
+  COLUMN_DEFS.forEach(function(c){ visibleCols[c.key] = true; });
+
+  function applyColumnVisibility(){
+    COLUMN_DEFS.forEach(function(c){
+      var show = visibleCols[c.key];
+      document.querySelectorAll('[data-col="' + c.key + '"]').forEach(function(el){
+        el.style.display = show ? '' : 'none';
+      });
+    });
+  }
+
+  function renderColumnsMenu(){
+    var list = document.getElementById('dv-columns-list');
+    list.innerHTML = COLUMN_DEFS.map(function(c){
+      return '<div class="col-menu-item"><span>' + c.label + '</span>' +
+        '<button class="toggle-switch" data-col-toggle="' + c.key + '" aria-pressed="' + (visibleCols[c.key] ? 'true' : 'false') + '" aria-label="Toggle ' + c.label + ' column"><span class="toggle-knob"></span></button></div>';
+    }).join('');
+    list.querySelectorAll('[data-col-toggle]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var key = btn.dataset.colToggle;
+        visibleCols[key] = !visibleCols[key];
+        btn.setAttribute('aria-pressed', visibleCols[key] ? 'true' : 'false');
+        applyColumnVisibility();
+      });
+    });
+  }
+
+  var columnsMenu = document.getElementById('dv-columns-menu');
+  function openColumnsMenu(){ renderColumnsMenu(); columnsMenu.hidden = false; }
+  function closeColumnsMenu(){ columnsMenu.hidden = true; }
+  document.getElementById('dv-columns').addEventListener('click', function(e){
+    e.stopPropagation();
+    if (columnsMenu.hidden) openColumnsMenu(); else closeColumnsMenu();
+  });
+  columnsMenu.addEventListener('click', function(e){ e.stopPropagation(); });
+  document.addEventListener('click', function(){ if (!columnsMenu.hidden) closeColumnsMenu(); });
+  document.getElementById('dv-columns-reset').addEventListener('click', function(){
+    COLUMN_DEFS.forEach(function(c){ visibleCols[c.key] = true; });
+    applyColumnVisibility();
+    renderColumnsMenu();
+  });
+
   function commPill(c){
     if (c === 'Communicating') return '<span class="pill success"><span class="dot"></span>Communicating</span>';
     if (c === 'Intermittent') return '<span class="pill warning"><span class="dot"></span>Intermittent</span>';
@@ -625,20 +715,21 @@
     var tbody = document.getElementById('dv-rows');
     tbody.innerHTML = pageRows.map(function(d){
       return '<tr>' +
-        '<td><input type="checkbox" class="dv-row-check"></td>' +
-        '<td><a class="dev-link" href="device-detail.html?id=' + encodeURIComponent(d.id) + '">' + d.id + '</a></td>' +
-        '<td>' + d.name + '</td>' +
-        '<td class="dim tabular">' + d.serial + '</td>' +
-        '<td>' + d.type + '</td>' +
-        '<td>' + d.group + '</td>' +
-        '<td>' + commPill(d.comm) + '</td>' +
-        '<td>' + powerPill(d.power) + '</td>' +
-        '<td>' + alarmCell(d.alarms) + '</td>' +
-        '<td class="dim">' + d.lastComm + '</td>' +
-        '<td class="dim tabular">' + d.firmware + '</td>' +
-        '<td><button class="row-menu-btn" aria-label="Row actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></td>' +
+        '<td data-col="check"><input type="checkbox" class="dv-row-check"></td>' +
+        '<td data-col="id"><a class="dev-link" href="device-detail.html?id=' + encodeURIComponent(d.id) + '">' + d.id + '</a></td>' +
+        '<td data-col="name">' + d.name + '</td>' +
+        '<td class="dim tabular" data-col="serial">' + d.serial + '</td>' +
+        '<td data-col="type">' + d.type + '</td>' +
+        '<td data-col="group">' + d.group + '</td>' +
+        '<td data-col="comm">' + commPill(d.comm) + '</td>' +
+        '<td data-col="power">' + powerPill(d.power) + '</td>' +
+        '<td data-col="alarms">' + alarmCell(d.alarms) + '</td>' +
+        '<td class="dim" data-col="lastComm">' + d.lastComm + '</td>' +
+        '<td class="dim tabular" data-col="firmware">' + d.firmware + '</td>' +
+        '<td data-col="actions"><button class="row-menu-btn" aria-label="Row actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></td>' +
         '</tr>';
     }).join('');
+    applyColumnVisibility();
 
     var showEnd = start + pageRows.length;
     document.getElementById('dv-showing').textContent = filtered.length === 0
